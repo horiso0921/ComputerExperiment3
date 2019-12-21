@@ -36,12 +36,12 @@ typedef enum {
   SLE    /* sle （<=，符号付き）*/
 } Cmptype;
 
-typedef struct FactoR{
+typedef struct factor{
   Scope type; /* 変数, 手続きの区別 */
   char val[MAXLENGTH+1]; /* 変数や手続きの場合の名前 */ 
   int cal; /* 変数の場合割り当てたレジスタ番号 */
-  struct FactoR *before;
-  struct FactoR *next;
+  struct factor *before;
+  struct factor *next;
 } Factor;
 
 /* 変数もしくは定数のためのスタック */
@@ -80,9 +80,6 @@ typedef struct llvmcode {
     struct { /* brc    */
       Factor arg1;  int arg2;  int arg3;
     } brcond;
-    struct{ /* call */
-      rtype rettype; char funcname[MAXLENGTH+1]; Factor arg1; Factor retval; 
-    } call;
     struct { /* label  */
       int l;
     } label;
@@ -101,6 +98,9 @@ typedef struct llvmcode {
     struct { /* icmp   */
       Cmptype type;  Factor arg1;  Factor arg2;  Factor retval;
     } icmp;
+    struct{ /* call */
+      rtype rettype; char funcname[MAXLENGTH+1]; Factor arg1; Factor retval; 
+    } call;
     struct { /* ret    */
       Factor arg1;
     } ret;
