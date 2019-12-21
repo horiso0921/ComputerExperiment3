@@ -1,4 +1,4 @@
-program EX1-1;
+program EX1;
 var Begin;
 begin
    Begin := 21;

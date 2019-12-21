@@ -1,5 +1,5 @@
-parser: y.tab.c lex.yy.c 
-	cc y.tab.c lex.yy.c -ll -o parser -std=c99
+parser: y.tab.c lex.yy.c
+	cc lex.yy.c y.tab.c -ll -o parser -std=c99
 
 y.tab.c: parser.y
 	yacc -d parser.y

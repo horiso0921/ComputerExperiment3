@@ -23,7 +23,6 @@ typedef enum {
   Icmp,     /* icmp   */
   Call,      /* call   */
   Ret       /* ret    */
-
 } LLVMcommand;
 
 /* 比較演算子の種類 */
@@ -75,7 +74,7 @@ typedef struct llvmcode {
       Factor arg1;  Factor retval;
     } load;
     struct { /* br     */
-      int arg1;
+      int *arg1;
     } bruncond;
     struct { /* brc    */
       Factor arg1;  int *arg2;  int *arg3;
@@ -148,7 +147,7 @@ Fundecl *decltl = NULL;
 Fundecl *global_decl = NULL;
 
 typedef struct brdecl{
-  int cond; int coll; int uncoll;
+  int cond; int coll; int uncoll; int inc;
   struct brdecl *next;
   struct brdecl *before;
 } Brdecl;
