@@ -4,7 +4,7 @@ typedef enum {
   GLOBAL_VAR, /* 大域変数 */
   LOCAL_VAR,  /* 局所変数 */
   PROC_NAME,  /* 手続き   */
-  CONSTANT,    /* 定数     */
+  CONSTANT    /* 定数     */
 } Scope;
 
 /* LLVM命令名の定義 */
@@ -14,6 +14,7 @@ typedef enum {
   Store,    /* store  */
   Load,     /* load   */
   BrUncond, /* br     */
+  Call,      /* call   */
   BrCond,   /* brc    */
   Label,    /* label  */
   Add,      /* add    */
@@ -22,6 +23,7 @@ typedef enum {
   Div,      /* div    */
   Icmp,     /* icmp   */
   Ret       /* ret    */
+
 } LLVMcommand;
 
 /* 比較演算子の種類 */
@@ -53,7 +55,7 @@ Factorstack global_fstack;
 
 typedef enum {
   I32,
-  vo,
+  vo
 } rtype;
 
 
@@ -78,6 +80,9 @@ typedef struct llvmcode {
     struct { /* brc    */
       Factor arg1;  int arg2;  int arg3;
     } brcond;
+    struct{ /* call */
+      rtype rettype; char funcname[MAXLENGTH+1]; Factor arg1; Factor retval; 
+    } call;
     struct { /* label  */
       int l;
     } label;
@@ -96,9 +101,6 @@ typedef struct llvmcode {
     struct { /* icmp   */
       Cmptype type;  Factor arg1;  Factor arg2;  Factor retval;
     } icmp;
-    struct{ /* call */
-      rtype rettype; char funcname[MAXLENGTH+1]; Factor arg1; Factor retval;
-    } call;
     struct { /* ret    */
       Factor arg1;
     } ret;

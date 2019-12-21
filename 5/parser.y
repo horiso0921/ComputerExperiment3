@@ -192,24 +192,32 @@ void displayLlvmcodes( LLVMcode *code ,FILE *fp){
                         fprintf(fp,"\n");
                         break;
                 case Call:
-                        if (strcmp((code->args).call.rtype, "void")){
+                        if  (!strcmp((code->args).call.funcname, "write")){
                                 displayFactor( (code->args).call.retval,fp );
-                                printf(" = call i32@");
+                                fprintf(fp," = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.str.1, i64 0, i64 0), i32 ");
+                                displayFactor( (code->args).call.arg1,fp );
+                        } else if (!strcmp((code->args).call.funcname, "read")){
+                                displayFactor( (code->args).call.retval,fp );
+                                fprintf(fp," = call i32 (i8*, ...) @__isoc99_scanf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str, i64 0, i64 0), i32* ");
+                                displayFactor( (code->args).call.arg1,fp );
                         } else{
-                                fprintf(fp,"call @");
+                                if ((code->args).call.rettype == I32){
+                                        displayFactor( (code->args).call.retval,fp );
+                                        fprintf(fp," = call i32 @%s", (code->args).call.funcname);
+                                } else {
+                                        fprintf(fp,"call void @%s", (code->args).call.funcname);
+                                }
+                                if (!strcmp((code->args).call.arg1.val, "void")){
+                                        fprintf(fp,"(");
+                                } else {
+                                        fprintf(fp,"( i32");
+                                        displayFactor( (code->args).call.arg1,fp);
+                                }
                         }
-                        displayFactor( (code->args).call.funcname,fp );
-                        if ((code->args).call.arg1 == NULL){
-                                fprintf(fp,"()");
-                        } else {
-                                fprintf(fp,"( i32");
-                                displayFactor( (code->args).call.arg1,fp);
-                                fprintf(fp,")");
-                        }
-                        fprintf(fp,"\n");
+                        fprintf(fp,")\n");
                         break;
                 case Ret:
-                        if (strcmp((code->args).ret.arg1.val, "void")) {
+                        if ((code->args).ret.arg1.type == CONSTANT) {
                                 fprintf(fp,"ret i32 "); 
                                 displayFactor( (code->args).ret.arg1,fp);
                         } else {
@@ -306,6 +314,10 @@ program
                 char fname[256];
                 strcpy(fname, "result.ll");
                 FILE *fp = fopen(fname, "wb");
+                fprintf(fp,"@.str = private unnamed_addr constant [3 x i8] c\"%%d\\00\", align 1\n");
+                fprintf(fp, "@.str.1 = private unnamed_addr constant [4 x i8] c\"%%d\\0A\\00\", align 1\n");
+                fprintf(fp, "declare i32 @__isoc99_scanf(i8*, ...)\n");
+                fprintf(fp, "declare i32 @printf(i8*, ...)\n");
                 if(global_decl != NULL ) {displayLlvmcodes(global_decl->codes,fp );
                 fprintf(fp,"\n");}
                 displayLlvmfundecl( declhd ,fp );
@@ -501,7 +513,19 @@ proc_call_statement
         ;
 
 proc_call_name 
-        : IDENT {lookup($1);}
+        : IDENT {
+                LLVMcode *tmp;
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Call; /* 命令の種類を加算に設定 */
+                lookup($1);
+                strcpy((tmp->args).call.funcname, $1);
+                (tmp->args).call.rettype = vo;
+                Factor arg1;
+                strcpy(arg1.val, "void");
+                (tmp->args).call.arg1 = arg1;
+                add_node(tmp);
+                }
         ;
 
 block_statement
@@ -509,11 +533,43 @@ block_statement
         ;
 
 read_statement 
-        : READ LPAREN IDENT {lookup($3);} RPAREN 
+        : READ LPAREN IDENT {factorpush(lookup($3));} RPAREN 
+        {
+                LLVMcode *tmp; /* 生成した命令へのポインタ */
+                Factor arg1, retval; /* 加算の引数・結果 */
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Call; /* 命令の種類を加算に設定 */
+                arg1 = factorpop();/*スタックから第2引数をポップ*/
+                retval.type = LOCAL_VAR;
+                retval.cal = Last_Register;
+                Last_Register ++;
+                (tmp->args).call.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).call.retval = retval; /* 命令の第 2 引数を指定 */
+                strcpy((tmp->args).call.funcname, "read");
+                (tmp->args).call.rettype = I32;
+                add_node(tmp);
+        }
         ;
 
 write_statement 
         : WRITE LPAREN expression RPAREN
+        {
+                LLVMcode *tmp; /* 生成した命令へのポインタ */
+                Factor arg1, retval; /* 加算の引数・結果 */
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Call; /* 命令の種類を加算に設定 */
+                arg1 = factorpop();/*スタックから第2引数をポップ*/
+                retval.type = LOCAL_VAR;
+                retval.cal = Last_Register;
+                Last_Register ++;
+                (tmp->args).call.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).call.retval = retval; /* 命令の第 2 引数を指定 */
+                strcpy((tmp->args).call.funcname, "write");
+                (tmp->args).call.rettype = I32;
+                add_node(tmp);  
+        }
         ;
 
 null_statement 

@@ -209,8 +209,33 @@ void displayLlvmcodes( LLVMcode *code ,FILE *fp){
                         displayFactor( (code->args).div.arg2,fp);
                         fprintf(fp,"\n");
                         break;
+                case Call:
+                        if  (!strcmp((code->args).call.funcname, "write")){
+                                displayFactor( (code->args).call.retval,fp );
+                                fprintf(fp," = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.str.1, i64 0, i64 0), i32 ");
+                                displayFactor( (code->args).call.arg1,fp );
+                        } else if (!strcmp((code->args).call.funcname, "read")){
+                                displayFactor( (code->args).call.retval,fp );
+                                fprintf(fp," = call i32 (i8*, ...) @__isoc99_scanf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str, i64 0, i64 0), i32* ");
+                                displayFactor( (code->args).call.arg1,fp );
+                        } else{
+                                if ((code->args).call.rettype == I32){
+                                        displayFactor( (code->args).call.retval,fp );
+                                        fprintf(fp," = call i32 @%s", (code->args).call.funcname);
+                                } else {
+                                        fprintf(fp,"call void @%s", (code->args).call.funcname);
+                                }
+                                if (!strcmp((code->args).call.arg1.val, "void")){
+                                        fprintf(fp,"(");
+                                } else {
+                                        fprintf(fp,"( i32");
+                                        displayFactor( (code->args).call.arg1,fp);
+                                }
+                        }
+                        fprintf(fp,")\n");
+                        break;
                 case Ret:
-                        if (strcmp((code->args).ret.arg1.val, "void")) {
+                        if ((code->args).ret.arg1.type == CONSTANT) {
                                 fprintf(fp,"ret i32 "); 
                                 displayFactor( (code->args).ret.arg1,fp);
                         } else {
@@ -268,7 +293,7 @@ void add_globalnode(LLVMcode *tmp){
         return;
 }
 
-#line 255 "parser.y"
+#line 280 "parser.y"
 #ifdef YYSTYPE
 #undef  YYSTYPE_IS_DECLARED
 #define YYSTYPE_IS_DECLARED 1
@@ -280,7 +305,7 @@ typedef union {
         char ident[MAXLENGTH+1];
 } YYSTYPE;
 #endif /* !YYSTYPE_IS_DECLARED */
-#line 283 "y.tab.c"
+#line 308 "y.tab.c"
 
 /* compatibility with bison */
 #ifdef YYPARSE_PARAM
@@ -609,14 +634,14 @@ typedef struct {
 } YYSTACKDATA;
 /* variables for the parser stack */
 static YYSTACKDATA yystack;
-#line 683 "parser.y"
+#line 756 "parser.y"
  
 
 void yyerror(char *s)
 {
   fprintf(stderr, "%s \nline=%d token=%s\n", s, yylineno, yytext);
 }
-#line 619 "y.tab.c"
+#line 644 "y.tab.c"
 
 #if YYDEBUG
 #include <stdio.h>		/* needed for printf */
@@ -823,11 +848,11 @@ yyreduce:
     switch (yyn)
     {
 case 1:
-#line 278 "parser.y"
+#line 303 "parser.y"
 	{init_fstack();}
 break;
 case 2:
-#line 279 "parser.y"
+#line 304 "parser.y"
 	{
                 LLVMcode *tmp;
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode));
@@ -841,6 +866,10 @@ case 2:
                 char fname[256];
                 strcpy(fname, "result.ll");
                 FILE *fp = fopen(fname, "wb");
+                fprintf(fp,"@.str = private unnamed_addr constant [3 x i8] c\"%%d\\00\", align 1\n");
+                fprintf(fp, "@.str.1 = private unnamed_addr constant [4 x i8] c\"%%d\\0A\\00\", align 1\n");
+                fprintf(fp, "declare i32 @__isoc99_scanf(i8*, ...)\n");
+                fprintf(fp, "declare i32 @printf(i8*, ...)\n");
                 if(global_decl != NULL ) {displayLlvmcodes(global_decl->codes,fp );
                 fprintf(fp,"\n");}
                 displayLlvmfundecl( declhd ,fp );
@@ -848,7 +877,7 @@ case 2:
         }
 break;
 case 9:
-#line 319 "parser.y"
+#line 348 "parser.y"
 	{
                 Fundecl *tmp;
                 tmp = (Fundecl *)malloc(sizeof(Fundecl));
@@ -884,7 +913,7 @@ case 9:
         }
 break;
 case 10:
-#line 353 "parser.y"
+#line 382 "parser.y"
 	{
                 Fundecl *tmp;
                 tmp = (Fundecl *)malloc(sizeof(Fundecl));
@@ -921,7 +950,7 @@ case 10:
         }
 break;
 case 13:
-#line 396 "parser.y"
+#line 425 "parser.y"
 	{
                 LLVMcode *tmp;
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode));
@@ -934,7 +963,7 @@ case 13:
         }
 break;
 case 15:
-#line 414 "parser.y"
+#line 443 "parser.y"
 	{ 
                 insert(yystack.l_mark[0].ident, 2);
                 Fundecl *tmp;
@@ -948,19 +977,19 @@ case 15:
         }
 break;
 case 16:
-#line 428 "parser.y"
+#line 457 "parser.y"
 	{Proc_Term++;}
 break;
 case 17:
-#line 428 "parser.y"
+#line 457 "parser.y"
 	{delete(); Proc_Term--;}
 break;
 case 29:
-#line 449 "parser.y"
+#line 478 "parser.y"
 	{factorpush(lookup(yystack.l_mark[0].ident));}
 break;
 case 30:
-#line 450 "parser.y"
+#line 479 "parser.y"
 	{
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
                 Factor arg1, arg2; /* 加算の引数・結果 */
@@ -975,19 +1004,69 @@ case 30:
         }
 break;
 case 35:
-#line 478 "parser.y"
+#line 507 "parser.y"
 	{lookup(yystack.l_mark[0].ident);}
 break;
 case 38:
-#line 487 "parser.y"
-	{lookup(yystack.l_mark[0].ident);}
+#line 516 "parser.y"
+	{
+                LLVMcode *tmp;
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Call; /* 命令の種類を加算に設定 */
+                lookup(yystack.l_mark[0].ident);
+                strcpy((tmp->args).call.funcname, yystack.l_mark[0].ident);
+                (tmp->args).call.rettype = vo;
+                Factor arg1;
+                strcpy(arg1.val, "void");
+                (tmp->args).call.arg1 = arg1;
+                add_node(tmp);
+                }
 break;
 case 40:
-#line 495 "parser.y"
-	{lookup(yystack.l_mark[0].ident);}
+#line 536 "parser.y"
+	{factorpush(lookup(yystack.l_mark[0].ident));}
+break;
+case 41:
+#line 537 "parser.y"
+	{
+                LLVMcode *tmp; /* 生成した命令へのポインタ */
+                Factor arg1, retval; /* 加算の引数・結果 */
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Call; /* 命令の種類を加算に設定 */
+                arg1 = factorpop();/*スタックから第2引数をポップ*/
+                retval.type = LOCAL_VAR;
+                retval.cal = Last_Register;
+                Last_Register ++;
+                (tmp->args).call.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).call.retval = retval; /* 命令の第 2 引数を指定 */
+                strcpy((tmp->args).call.funcname, "read");
+                (tmp->args).call.rettype = I32;
+                add_node(tmp);
+        }
+break;
+case 42:
+#line 557 "parser.y"
+	{
+                LLVMcode *tmp; /* 生成した命令へのポインタ */
+                Factor arg1, retval; /* 加算の引数・結果 */
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Call; /* 命令の種類を加算に設定 */
+                arg1 = factorpop();/*スタックから第2引数をポップ*/
+                retval.type = LOCAL_VAR;
+                retval.cal = Last_Register;
+                Last_Register ++;
+                (tmp->args).call.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).call.retval = retval; /* 命令の第 2 引数を指定 */
+                strcpy((tmp->args).call.funcname, "write");
+                (tmp->args).call.rettype = I32;
+                add_node(tmp);  
+        }
 break;
 case 53:
-#line 520 "parser.y"
+#line 593 "parser.y"
 	{
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
                 Factor arg1, arg2, retval; /* 加算の引数・結果 */
@@ -1007,7 +1086,7 @@ case 53:
         }
 break;
 case 54:
-#line 538 "parser.y"
+#line 611 "parser.y"
 	{
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
                 Factor arg1, arg2, retval; /* 加算の引数・結果 */
@@ -1027,7 +1106,7 @@ case 54:
         }
 break;
 case 56:
-#line 560 "parser.y"
+#line 633 "parser.y"
 	{
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
                 Factor arg1, arg2, retval; /* 加算の引数・結果 */
@@ -1047,7 +1126,7 @@ case 56:
         }
 break;
 case 57:
-#line 579 "parser.y"
+#line 652 "parser.y"
 	{
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
                 Factor arg1, arg2, retval; /* 加算の引数・結果 */
@@ -1067,7 +1146,7 @@ case 57:
         }
 break;
 case 58:
-#line 601 "parser.y"
+#line 674 "parser.y"
 	{
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
                 Factor arg1, retval; /* 加算の引数・結果 */
@@ -1085,7 +1164,7 @@ case 58:
         }
 break;
 case 59:
-#line 617 "parser.y"
+#line 690 "parser.y"
 	{
                 Factor tmp;
                 tmp.type=CONSTANT;
@@ -1094,11 +1173,11 @@ case 59:
         }
 break;
 case 61:
-#line 627 "parser.y"
+#line 700 "parser.y"
 	{factorpush(lookup(yystack.l_mark[0].ident));}
 break;
 case 64:
-#line 637 "parser.y"
+#line 710 "parser.y"
 	{ 
                 Factor tmp;
                 tmp = insert(yystack.l_mark[0].ident, 0); 
@@ -1123,7 +1202,7 @@ case 64:
         }
 break;
 case 65:
-#line 660 "parser.y"
+#line 733 "parser.y"
 	{ 
                 Factor tmp;
                 tmp = insert(yystack.l_mark[0].ident, 0); 
@@ -1146,7 +1225,7 @@ case 65:
                 }
         }
 break;
-#line 1149 "y.tab.c"
+#line 1228 "y.tab.c"
     }
     yystack.s_mark -= yym;
     yystate = *yystack.s_mark;

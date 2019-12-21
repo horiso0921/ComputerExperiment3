@@ -7,7 +7,7 @@ void prime(){
         m = m - 1;
     }
     if (m == 1){
-        printf("%d",x);
+        printf("%d\n",x);
     }
 }
 
