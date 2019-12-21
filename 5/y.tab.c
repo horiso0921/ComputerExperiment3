@@ -152,6 +152,31 @@ void displayFactor( Factor factor ,FILE *fp){
         return;
 }
 
+void displayCmptype( Cmptype cmptype, FILE *fp){
+        switch(cmptype){
+                case EQUAL:
+                        fprintf(fp,"eq" );
+                        break;
+                case NE:
+                        fprintf(fp,"ne" );
+                        break;
+                case SGT:
+                        fprintf(fp,"sgt" );
+                        break;
+                case SGE:
+                        fprintf(fp,"sge" );
+                        break;
+                case SLT:
+                        fprintf(fp,"slt" );
+                        break;
+                case SLE:
+                        fprintf(fp,"sle" );
+                        break;
+                default:
+                        break;
+        }
+}
+
 void displayLlvmcodes( LLVMcode *code ,FILE *fp){
         if( code == NULL ) return;
         if( code->command  != Global)fprintf(fp,"  ");
@@ -243,6 +268,14 @@ void displayLlvmcodes( LLVMcode *code ,FILE *fp){
                         }
                         fprintf(fp,"\n");
                         break;
+                case Icmp:
+                        displayFactor((code->args).icmp.retval,fp);
+                        fprintf(fp," = icmp ");
+                        displayCmptype((code->args).icmp.type,fp);
+                        fprintf(fp," i32 ");
+                        displayFactor((code->args).icmp.arg1,fp);
+                        fprintf(fp,", ");
+                        displayFactor((code->args).icmp.arg2,fp);
                 default:
                         fprintf(fp,"This is error");
                         break;
@@ -293,7 +326,7 @@ void add_globalnode(LLVMcode *tmp){
         return;
 }
 
-#line 280 "parser.y"
+#line 313 "parser.y"
 #ifdef YYSTYPE
 #undef  YYSTYPE_IS_DECLARED
 #define YYSTYPE_IS_DECLARED 1
@@ -305,7 +338,7 @@ typedef union {
         char ident[MAXLENGTH+1];
 } YYSTYPE;
 #endif /* !YYSTYPE_IS_DECLARED */
-#line 308 "y.tab.c"
+#line 341 "y.tab.c"
 
 /* compatibility with bison */
 #ifdef YYPARSE_PARAM
@@ -634,14 +667,14 @@ typedef struct {
 } YYSTACKDATA;
 /* variables for the parser stack */
 static YYSTACKDATA yystack;
-#line 756 "parser.y"
+#line 789 "parser.y"
  
 
 void yyerror(char *s)
 {
   fprintf(stderr, "%s \nline=%d token=%s\n", s, yylineno, yytext);
 }
-#line 644 "y.tab.c"
+#line 677 "y.tab.c"
 
 #if YYDEBUG
 #include <stdio.h>		/* needed for printf */
@@ -848,11 +881,11 @@ yyreduce:
     switch (yyn)
     {
 case 1:
-#line 303 "parser.y"
+#line 336 "parser.y"
 	{init_fstack();}
 break;
 case 2:
-#line 304 "parser.y"
+#line 337 "parser.y"
 	{
                 LLVMcode *tmp;
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode));
@@ -877,7 +910,7 @@ case 2:
         }
 break;
 case 9:
-#line 348 "parser.y"
+#line 381 "parser.y"
 	{
                 Fundecl *tmp;
                 tmp = (Fundecl *)malloc(sizeof(Fundecl));
@@ -913,7 +946,7 @@ case 9:
         }
 break;
 case 10:
-#line 382 "parser.y"
+#line 415 "parser.y"
 	{
                 Fundecl *tmp;
                 tmp = (Fundecl *)malloc(sizeof(Fundecl));
@@ -950,7 +983,7 @@ case 10:
         }
 break;
 case 13:
-#line 425 "parser.y"
+#line 458 "parser.y"
 	{
                 LLVMcode *tmp;
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode));
@@ -963,7 +996,7 @@ case 13:
         }
 break;
 case 15:
-#line 443 "parser.y"
+#line 476 "parser.y"
 	{ 
                 insert(yystack.l_mark[0].ident, 2);
                 Fundecl *tmp;
@@ -977,19 +1010,19 @@ case 15:
         }
 break;
 case 16:
-#line 457 "parser.y"
+#line 490 "parser.y"
 	{Proc_Term++;}
 break;
 case 17:
-#line 457 "parser.y"
+#line 490 "parser.y"
 	{delete(); Proc_Term--;}
 break;
 case 29:
-#line 478 "parser.y"
+#line 511 "parser.y"
 	{factorpush(lookup(yystack.l_mark[0].ident));}
 break;
 case 30:
-#line 479 "parser.y"
+#line 512 "parser.y"
 	{
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
                 Factor arg1, arg2; /* 加算の引数・結果 */
@@ -1004,11 +1037,11 @@ case 30:
         }
 break;
 case 35:
-#line 507 "parser.y"
+#line 540 "parser.y"
 	{lookup(yystack.l_mark[0].ident);}
 break;
 case 38:
-#line 516 "parser.y"
+#line 549 "parser.y"
 	{
                 LLVMcode *tmp;
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
@@ -1024,11 +1057,11 @@ case 38:
                 }
 break;
 case 40:
-#line 536 "parser.y"
+#line 569 "parser.y"
 	{factorpush(lookup(yystack.l_mark[0].ident));}
 break;
 case 41:
-#line 537 "parser.y"
+#line 570 "parser.y"
 	{
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
                 Factor arg1, retval; /* 加算の引数・結果 */
@@ -1047,7 +1080,7 @@ case 41:
         }
 break;
 case 42:
-#line 557 "parser.y"
+#line 590 "parser.y"
 	{
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
                 Factor arg1, retval; /* 加算の引数・結果 */
@@ -1066,7 +1099,7 @@ case 42:
         }
 break;
 case 53:
-#line 593 "parser.y"
+#line 626 "parser.y"
 	{
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
                 Factor arg1, arg2, retval; /* 加算の引数・結果 */
@@ -1086,7 +1119,7 @@ case 53:
         }
 break;
 case 54:
-#line 611 "parser.y"
+#line 644 "parser.y"
 	{
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
                 Factor arg1, arg2, retval; /* 加算の引数・結果 */
@@ -1106,7 +1139,7 @@ case 54:
         }
 break;
 case 56:
-#line 633 "parser.y"
+#line 666 "parser.y"
 	{
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
                 Factor arg1, arg2, retval; /* 加算の引数・結果 */
@@ -1126,7 +1159,7 @@ case 56:
         }
 break;
 case 57:
-#line 652 "parser.y"
+#line 685 "parser.y"
 	{
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
                 Factor arg1, arg2, retval; /* 加算の引数・結果 */
@@ -1146,7 +1179,7 @@ case 57:
         }
 break;
 case 58:
-#line 674 "parser.y"
+#line 707 "parser.y"
 	{
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
                 Factor arg1, retval; /* 加算の引数・結果 */
@@ -1164,7 +1197,7 @@ case 58:
         }
 break;
 case 59:
-#line 690 "parser.y"
+#line 723 "parser.y"
 	{
                 Factor tmp;
                 tmp.type=CONSTANT;
@@ -1173,11 +1206,11 @@ case 59:
         }
 break;
 case 61:
-#line 700 "parser.y"
+#line 733 "parser.y"
 	{factorpush(lookup(yystack.l_mark[0].ident));}
 break;
 case 64:
-#line 710 "parser.y"
+#line 743 "parser.y"
 	{ 
                 Factor tmp;
                 tmp = insert(yystack.l_mark[0].ident, 0); 
@@ -1202,7 +1235,7 @@ case 64:
         }
 break;
 case 65:
-#line 733 "parser.y"
+#line 766 "parser.y"
 	{ 
                 Factor tmp;
                 tmp = insert(yystack.l_mark[0].ident, 0); 
@@ -1225,7 +1258,7 @@ case 65:
                 }
         }
 break;
-#line 1228 "y.tab.c"
+#line 1261 "y.tab.c"
     }
     yystack.s_mark -= yym;
     yystate = *yystack.s_mark;

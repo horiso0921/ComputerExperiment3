@@ -134,7 +134,7 @@ void displayFactor( Factor factor ,FILE *fp){
         return;
 }
 
-void displayCmptype( Cmptype cmptype, FLLE *fp){
+void displayCmptype( Cmptype cmptype, FILE *fp){
         switch(cmptype){
                 case EQUAL:
                         fprintf(fp,"eq" );
@@ -251,13 +251,13 @@ void displayLlvmcodes( LLVMcode *code ,FILE *fp){
                         fprintf(fp,"\n");
                         break;
                 case Icmp:
-                        displayFactor((code->args).ret.retval,fp);
+                        displayFactor((code->args).icmp.retval,fp);
                         fprintf(fp," = icmp ");
-                        displayCmptype((code->args).ret.type,fp);
+                        displayCmptype((code->args).icmp.type,fp);
                         fprintf(fp," i32 ");
-                        displayFactor((code->args).ret.arg1,fp);
+                        displayFactor((code->args).icmp.arg1,fp);
                         fprintf(fp,", ");
-                        displayFactor((code->args).ret.arg2,fp);
+                        displayFactor((code->args).icmp.arg2,fp);
                 default:
                         fprintf(fp,"This is error");
                         break;
