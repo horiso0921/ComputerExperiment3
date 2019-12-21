@@ -611,11 +611,119 @@ null_statement
 
 condition 
         : expression EQ expression
+        {
+                LLVMcode *tmp; /* 生成した命令へのポインタ */
+                Factor arg1, arg2, retval; /* 加算の引数・結果 */
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Icmp; /* 命令の種類を加算に設定 */
+                arg2 = factorpop();/*スタックから第2引数をポップ*/
+                arg1 = factorpop();/*スタックから第1引数をポップ*/
+                retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
+                retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
+                Last_Register ++; /* カウンタをインクリメント */
+                (tmp->args).add.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).add.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).add.retval = retval; /* 結果のレジスタを指定 */
+                (tmp->args).add.type = EQUAL;
+                add_node(tmp);
+                factorpush( retval ); /* 加算の結果をスタックにプッシュ */
+        }
         | expression NEQ expression
+        {
+                LLVMcode *tmp; /* 生成した命令へのポインタ */
+                Factor arg1, arg2, retval; /* 加算の引数・結果 */
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Icmp; /* 命令の種類を加算に設定 */
+                arg2 = factorpop();/*スタックから第2引数をポップ*/
+                arg1 = factorpop();/*スタックから第1引数をポップ*/
+                retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
+                retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
+                Last_Register ++; /* カウンタをインクリメント */
+                (tmp->args).add.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).add.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).add.retval = retval; /* 結果のレジスタを指定 */
+                (tmp->args).add.type = NE;
+                add_node(tmp);
+                factorpush( retval ); /* 加算の結果をスタックにプッシュ */
+        }
         | expression LT expression
+        {
+                LLVMcode *tmp; /* 生成した命令へのポインタ */
+                Factor arg1, arg2, retval; /* 加算の引数・結果 */
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Icmp; /* 命令の種類を加算に設定 */
+                arg2 = factorpop();/*スタックから第2引数をポップ*/
+                arg1 = factorpop();/*スタックから第1引数をポップ*/
+                retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
+                retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
+                Last_Register ++; /* カウンタをインクリメント */
+                (tmp->args).add.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).add.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).add.retval = retval; /* 結果のレジスタを指定 */
+                (tmp->args).add.type = SGT;
+                add_node(tmp);
+                factorpush( retval ); /* 加算の結果をスタックにプッシュ */
+        }
         | expression LE expression
+        {
+                LLVMcode *tmp; /* 生成した命令へのポインタ */
+                Factor arg1, arg2, retval; /* 加算の引数・結果 */
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Icmp; /* 命令の種類を加算に設定 */
+                arg2 = factorpop();/*スタックから第2引数をポップ*/
+                arg1 = factorpop();/*スタックから第1引数をポップ*/
+                retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
+                retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
+                Last_Register ++; /* カウンタをインクリメント */
+                (tmp->args).add.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).add.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).add.retval = retval; /* 結果のレジスタを指定 */
+                (tmp->args).add.type = SGE;
+                add_node(tmp);
+                factorpush( retval ); /* 加算の結果をスタックにプッシュ */
+        }
         | expression GT expression
+        {
+                LLVMcode *tmp; /* 生成した命令へのポインタ */
+                Factor arg1, arg2, retval; /* 加算の引数・結果 */
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Icmp; /* 命令の種類を加算に設定 */
+                arg2 = factorpop();/*スタックから第2引数をポップ*/
+                arg1 = factorpop();/*スタックから第1引数をポップ*/
+                retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
+                retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
+                Last_Register ++; /* カウンタをインクリメント */
+                (tmp->args).add.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).add.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).add.retval = retval; /* 結果のレジスタを指定 */
+                (tmp->args).add.type = SLT;
+                add_node(tmp);
+                factorpush( retval ); /* 加算の結果をスタックにプッシュ */
+        }
         | expression GE expression
+        {
+                LLVMcode *tmp; /* 生成した命令へのポインタ */
+                Factor arg1, arg2, retval; /* 加算の引数・結果 */
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Icmp; /* 命令の種類を加算に設定 */
+                arg2 = factorpop();/*スタックから第2引数をポップ*/
+                arg1 = factorpop();/*スタックから第1引数をポップ*/
+                retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
+                retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
+                Last_Register ++; /* カウンタをインクリメント */
+                (tmp->args).add.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).add.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).add.retval = retval; /* 結果のレジスタを指定 */
+                (tmp->args).add.type = SLE;
+                add_node(tmp);
+                factorpush( retval ); /* 加算の結果をスタックにプッシュ */
+        }
         ;
 
 expression 
