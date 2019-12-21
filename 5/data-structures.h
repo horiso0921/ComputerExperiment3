@@ -14,7 +14,6 @@ typedef enum {
   Store,    /* store  */
   Load,     /* load   */
   BrUncond, /* br     */
-  Call,      /* call   */
   BrCond,   /* brc    */
   Label,    /* label  */
   Add,      /* add    */
@@ -22,6 +21,7 @@ typedef enum {
   Mul,      /* mul    */
   Div,      /* div    */
   Icmp,     /* icmp   */
+  Call,      /* call   */
   Ret       /* ret    */
 
 } LLVMcommand;
@@ -124,8 +124,6 @@ Factor factorpop(){
   tmp = fstack.element[fstack.top];
   fstack.top --;
   return tmp;
-
-
 }
 
 void factorpush(Factor x) {
@@ -148,3 +146,12 @@ Fundecl *declhd = NULL;
 /* 関数定義の線形リストの末尾の要素のアドレスを保持するポインタ */
 Fundecl *decltl = NULL;
 Fundecl *global_decl = NULL;
+
+typedef struct brdecl{
+  Factor self, arg1, arg2;
+  struct brdecl *next;
+  struct brdecl *before;
+} Brdecl;
+
+Brdecl *brdecl_hd = NULL;
+Brdecl *brdecl_tl = NULL;

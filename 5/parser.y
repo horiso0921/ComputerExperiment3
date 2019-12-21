@@ -184,6 +184,14 @@ void displayLlvmcodes( LLVMcode *code ,FILE *fp){
                         displayFactor( (code->args).load.arg1 ,fp);
                         fprintf(fp,", align 4\n");
                         break;
+                case BrUncond:
+                        fprintf(fp, "br label %%%d\n\n",(code->args).bruncond.arg1);
+                        break;
+                case BrCond:
+                        fprintf(fp, "br i1 ");
+                        displayFactor((code->args).brcond.arg1, fp);
+                        fprintf(fp, ", label %%%d, label %%%d\n\n", (code->args).brcond.arg2, (code->args).brcond.arg3);
+                        break;
                 case Add:
                         displayFactor( (code->args).add.retval ,fp);
                         fprintf(fp," = add nsw i32 ");
@@ -499,9 +507,39 @@ statement_list
 
 statement
         : assignment_statement
-        | if_statement
-        | while_statement
-        | for_statement
+        |
+        {
+                LLVMcode *tmp;
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = BrUncond; /* 命令の種類を加算に設定 */
+                (tmp->args).bruncond.arg1 = Last_Register;
+                Last_Register ++;
+                add_node(tmp);
+        } 
+        if_statement
+        | 
+        {
+                LLVMcode *tmp;
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = BrUncond; /* 命令の種類を加算に設定 */
+                (tmp->args).bruncond.arg1 = Last_Register;
+                Last_Register ++;
+                add_node(tmp);
+        }
+        while_statement
+        |         
+        {
+                LLVMcode *tmp;
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = BrUncond; /* 命令の種類を加算に設定 */
+                (tmp->args).bruncond.arg1 = Last_Register;
+                Last_Register ++;
+                add_node(tmp);
+        }
+        for_statement
         | proc_call_statement
         | null_statement
         | block_statement
@@ -526,7 +564,8 @@ assignment_statement
         ;
 
 if_statement 
-        : IF condition THEN statement else_statement
+        : IF condition 
+        THEN statement else_statement
         ;
 
 else_statement 

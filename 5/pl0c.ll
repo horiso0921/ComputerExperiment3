@@ -1,12 +1,12 @@
-; ModuleID = 'pl0b.c'
-source_filename = "pl0b.c"
+; ModuleID = 'pl0c.c'
+source_filename = "pl0c.c"
 target datalayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-unknown-linux-gnu"
 
 @x = common dso_local global i32 0, align 4
-@.str = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
-@.str.1 = private unnamed_addr constant [3 x i8] c"%d\00", align 1
+@.str = private unnamed_addr constant [3 x i8] c"%d\00", align 1
 @n = common dso_local global i32 0, align 4
+@i = common dso_local global i32 0, align 4
 
 ; Function Attrs: noinline nounwind optnone uwtable
 define dso_local void @prime() #0 {
@@ -16,7 +16,7 @@ define dso_local void @prime() #0 {
   store i32 %3, i32* %1, align 4
   br label %4
 
-4:                                                
+4:                                                ; preds = %12, %0
   %5 = load i32, i32* @x, align 4
   %6 = load i32, i32* @x, align 4
   %7 = load i32, i32* %1, align 4
@@ -26,23 +26,23 @@ define dso_local void @prime() #0 {
   %11 = icmp ne i32 %5, %10
   br i1 %11, label %12, label %15
 
-12:                         
+12:                                               ; preds = %4
   %13 = load i32, i32* %1, align 4
-  %14 = sub nsw i32 %13, 1
+  %14 = add nsw i32 %13, -1
   store i32 %14, i32* %1, align 4
   br label %4
 
-15:                                               
+15:                                               ; preds = %4
   %16 = load i32, i32* %1, align 4
   %17 = icmp eq i32 %16, 1
   br i1 %17, label %18, label %21
 
-18:                                              
+18:                                               ; preds = %15
   %19 = load i32, i32* @x, align 4
-  %20 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.str, i64 0, i64 0), i32 %19)
+  %20 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str, i64 0, i64 0), i32 %19)
   br label %21
 
-21:                                               
+21:                                               ; preds = %18, %15
   ret void
 }
 
@@ -52,26 +52,30 @@ declare dso_local i32 @printf(i8*, ...) #1
 define dso_local i32 @main() #0 {
   %1 = alloca i32, align 4
   store i32 0, i32* %1, align 4
-  %2 = call i32 (i8*, ...) @__isoc99_scanf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str.1, i64 0, i64 0), i32* @n)
+  %2 = call i32 (i8*, ...) @__isoc99_scanf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str, i64 0, i64 0), i32* @n)
+  store i32 2, i32* @i, align 4
   br label %3
 
-3:                                                ; preds = %6, %0
-  %4 = load i32, i32* @n, align 4
-  %5 = icmp slt i32 1, %4
-  br i1 %5, label %6, label %10
+3:                                                ; preds = %9, %0
+  %4 = load i32, i32* @i, align 4
+  %5 = load i32, i32* @n, align 4
+  %6 = icmp sle i32 %4, %5
+  br i1 %6, label %7, label %12
 
-6:                                                ; preds = %3
-  %7 = load i32, i32* @n, align 4
-  store i32 %7, i32* @x, align 4
+7:                                                ; preds = %3
+  %8 = load i32, i32* @i, align 4
+  store i32 %8, i32* @x, align 4
   call void @prime()
-  %8 = load i32, i32* @n, align 4
-  %9 = sub nsw i32 %8, 1
-  store i32 %9, i32* @n, align 4
+  br label %9
+
+9:                                                ; preds = %7
+  %10 = load i32, i32* @i, align 4
+  %11 = add nsw i32 %10, 1
+  store i32 %11, i32* @i, align 4
   br label %3
 
-10:                                               ; preds = %3
-  %11 = load i32, i32* %1, align 4
-  ret i32 %11
+12:                                               ; preds = %3
+  ret i32 0
 }
 
 declare dso_local i32 @__isoc99_scanf(i8*, ...) #1
