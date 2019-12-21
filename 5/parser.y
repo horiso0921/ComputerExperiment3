@@ -564,17 +564,6 @@ statement
 
         }
         |
-        {
-                LLVMcode *tmp;
-                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
-                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
-                tmp->command = BrUncond; /* 命令の種類を加算に設定 */
-                (tmp->args).bruncond.arg1 = Last_Register;
-                add_node(tmp);
-                Brdecl *br_tmp;
-                br_tmp = (Brdecl *)malloc(sizeof(Brdecl));
-                add_brnode(br_tmp);
-        }
         for_statement
         {
                 LLVMcode *tmp;
@@ -718,7 +707,11 @@ while_statement
         ;
 
 for_statement 
-        : FOR IDENT {factorpush(lookup($2));} ASSIGN expression
+        : FOR IDENT 
+        {
+                factorpush(lookup($2));
+        } 
+                ASSIGN expression
         {
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
                 Factor arg1, arg2; /* 加算の引数・結果 */
@@ -731,7 +724,159 @@ for_statement
                 (tmp->args).store.arg2 = arg2; /* 命令の第 2 引数を指定 */
                 add_node(tmp);
         }
-                TO expression DO statement 
+                TO 
+        {
+                LLVMcode *tmp;
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = BrUncond; /* 命令の種類を加算に設定 */
+                (tmp->args).bruncond.arg1 = Last_Register;
+                add_node(tmp);
+                Brdecl *br_tmp;
+                br_tmp = (Brdecl *)malloc(sizeof(Brdecl));
+                add_brnode(br_tmp);
+                br_tmp->cond = Last_Register;
+        }
+        {
+                LLVMcode *tmp;
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Label; /* 命令の種類を加算に設定 */
+                (tmp->args).label.l = Last_Register;
+                add_node(tmp);
+                Last_Register++;
+        }
+        {
+                Factor arg;
+                arg = lookup($2);
+                LLVMcode *tmp; /* 生成した命令へのポインタ */
+                Factor arg1, retval; /* 加算の引数・結果 */
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Load; /* 命令の種類を加算に設定 */
+                retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
+                retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
+                Last_Register++;
+                (tmp->args).load.arg1 = arg; /* 命令の第 1 引数を指定 */
+                (tmp->args).load.retval = retval; /* 命令の第 2 引数を指定 */
+                add_node(tmp);  
+                factorpush(retval);
+        }
+                expression 
+        {
+                LLVMcode *tmp; /* 生成した命令へのポインタ */
+                Factor arg1, arg2, retval; /* 加算の引数・結果 */
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Icmp; /* 命令の種類を加算に設定 */
+                retval.type = LOCAL_VAR;
+                retval.cal = Last_Register;
+                Last_Register++;
+                arg2 = factorpop();/*スタックから第2引数をポップ*/
+                arg1 = factorpop();/*スタックから第1引数をポップ*/
+                (tmp->args).icmp.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).icmp.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).icmp.retval = retval; /* 命令の第 1 引数を指定 */
+                (tmp->args).icmp.type = SLE;
+                add_node(tmp);
+                factorpush(retval);
+        }
+                DO 
+        {
+                LLVMcode *tmp;
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = BrCond; /* 命令の種類を加算に設定 */
+                Factor arg1;
+                arg1 = factorpop();
+                (tmp->args).brcond.arg1 = arg1;
+                (tmp->args).brcond.arg2 = &br_decl->coll;
+                (tmp->args).brcond.arg3 = &br_decl->uncoll;
+                br_decl->coll = Last_Register;
+                add_node(tmp);
+        }
+        {
+                LLVMcode *tmp;
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Label; /* 命令の種類を加算に設定 */
+                (tmp->args).label.l = Last_Register;
+                add_node(tmp);
+                Last_Register ++;
+        }
+                statement 
+        {
+                LLVMcode *tmp;
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = BrUncond; /* 命令の種類を加算に設定 */
+                (tmp->args).bruncond.arg1 = Last_Register;
+                add_node(tmp);
+        }
+        {
+                LLVMcode *tmp;
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Label; /* 命令の種類を加算に設定 */
+                (tmp->args).label.l = Last_Register;
+                add_node(tmp);
+                Last_Register ++;
+        }
+        {
+                factorpush(lookup($2));
+                LLVMcode *tmp; /* 生成した命令へのポインタ */
+                Factor arg1, retval; /* 加算の引数・結果 */
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Load; /* 命令の種類を加算に設定 */
+                arg1 = factorpop();/*スタックから第1引数をポップ*/
+                retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
+                retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
+                Last_Register++;
+                (tmp->args).load.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).load.retval = retval; /* 命令の第 2 引数を指定 */
+                add_node(tmp);  
+                factorpush(retval);
+        }
+        {
+                LLVMcode *tmp; /* 生成した命令へのポインタ */
+                Factor arg1, arg2, retval; /* 加算の引数・結果 */
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Add; /* 命令の種類を加算に設定 */
+                arg1= factorpop();/*スタックから第2引数をポップ*/
+                arg2.type = CONSTANT;
+                arg2.cal = 1;
+                retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
+                retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
+                Last_Register ++; /* カウンタをインクリメント */
+                (tmp->args).add.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).add.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).add.retval = retval; /* 結果のレジスタを指定 */
+                add_node(tmp);
+                factorpush( retval ); /* 加算の結果をスタックにプッシュ */
+        }
+        {
+                factorpush(lookup($2));
+                LLVMcode *tmp; /* 生成した命令へのポインタ */
+                Factor arg1, arg2; /* 加算の引数・結果 */
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Store; /* 命令の種類を加算に設定 */
+                arg2 = factorpop();/*スタックから第2引数をポップ*/
+                arg1 = factorpop();/*スタックから第1引数をポップ*/
+                (tmp->args).store.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).store.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                add_node(tmp);
+        }
+        {
+                LLVMcode *tmp;
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = BrUncond; /* 命令の種類を加算に設定 */
+                (tmp->args).bruncond.arg1 = br_decl->cond;
+                add_node(tmp);
+        }
         ;
 
 proc_call_statement
