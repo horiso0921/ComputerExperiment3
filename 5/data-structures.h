@@ -78,7 +78,7 @@ typedef struct llvmcode {
       int arg1;
     } bruncond;
     struct { /* brc    */
-      Factor arg1;  int arg2;  int arg3;
+      Factor arg1;  int *arg2;  int *arg3;
     } brcond;
     struct { /* label  */
       int l;
@@ -148,10 +148,9 @@ Fundecl *decltl = NULL;
 Fundecl *global_decl = NULL;
 
 typedef struct brdecl{
-  Factor self, arg1, arg2;
+  int cond; int coll; int uncoll;
   struct brdecl *next;
   struct brdecl *before;
 } Brdecl;
 
-Brdecl *brdecl_hd = NULL;
-Brdecl *brdecl_tl = NULL;
+Brdecl *br_decl = NULL;

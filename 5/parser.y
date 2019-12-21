@@ -35,7 +35,7 @@ void lookall(Factor *factor){
 }
 
 Factor insert(char *name, int flag) {
-        printf("insert\n");
+        // printf("insert\n");
         Factor *tmp;
         tmp = (Factor *)malloc(sizeof(Factor));
         tmp->type = flag + Proc_Term;
@@ -54,9 +54,9 @@ Factor insert(char *name, int flag) {
                 Stack_tl->next = tmp;
         }
         Stack_tl = tmp;
-        printf("======================\n");
-        lookall(Stack_hd);
-        printf("======================\n");
+        // printf("======================\n");
+        // lookall(Stack_hd);
+        // printf("======================\n");
         Factor res;
         res.type = tmp->type;
         res.cal = tmp->cal;
@@ -75,17 +75,17 @@ Factor lookup(char *name){
                         return res;
                 }
         }
-        switch (fact->type) {
-                case GLOBAL_VAR:
-                        printf("FOUND == GLOBAL       %s\n", fact->val);
-                        break;
-                case LOCAL_VAR:
-                        printf("FOUND == LOCAL    %d   %s\n", fact->cal, fact->val);
-                        break;
-                case PROC_NAME:
-                        printf("FOUND == PROC         %s\n", fact->val);
-                        break;
-        }
+        // switch (fact->type) {
+        //         case GLOBAL_VAR:
+        //                 printf("FOUND == GLOBAL       %s\n", fact->val);
+        //                 break;
+        //         case LOCAL_VAR:
+        //                 printf("FOUND == LOCAL    %d   %s\n", fact->cal, fact->val);
+        //                 break;
+        //         case PROC_NAME:
+        //                 printf("FOUND == PROC         %s\n", fact->val);
+        //                 break;
+        // }
         Factor res;
         res.type = fact->type;
         res.cal = fact->cal;
@@ -94,7 +94,7 @@ Factor lookup(char *name){
 }
 
 void delete(){
-        printf("delete\n");
+        // printf("delete\n");
         Factor *tmp;
         while((Stack_tl->type == LOCAL_VAR)){
                 tmp = Stack_tl->before;
@@ -102,9 +102,9 @@ void delete(){
                 Stack_tl = tmp;
                 Stack_tl->next = NULL;
         }
-        printf("======================\n");
-        lookall(Stack_hd);
-        printf("======================\n");
+        // printf("======================\n");
+        // lookall(Stack_hd);
+        // printf("======================\n");
         Last_Register = 1;
 }
 
@@ -161,7 +161,7 @@ void displayCmptype( Cmptype cmptype, FILE *fp){
 
 void displayLlvmcodes( LLVMcode *code ,FILE *fp){
         if( code == NULL ) return;
-        if( code->command  != Global)fprintf(fp,"  ");
+        if( code->command  != Global && code->command != Label)fprintf(fp,"  ");
         switch( code->command ){
                 case Alloca:
                         displayFactor( (code->args).alloca.retval ,fp);
@@ -190,7 +190,10 @@ void displayLlvmcodes( LLVMcode *code ,FILE *fp){
                 case BrCond:
                         fprintf(fp, "br i1 ");
                         displayFactor((code->args).brcond.arg1, fp);
-                        fprintf(fp, ", label %%%d, label %%%d\n\n", (code->args).brcond.arg2, (code->args).brcond.arg3);
+                        fprintf(fp, ", label %%%d, label %%%d\n\n", *(code->args).brcond.arg2, *(code->args).brcond.arg3);
+                        break;
+                case Label:
+                        fprintf(fp, "%d:\n",(code->args).label.l);
                         break;
                 case Add:
                         displayFactor( (code->args).add.retval ,fp);
@@ -316,6 +319,15 @@ void add_globalnode(LLVMcode *tmp){
         }
         global_codetl = tmp;
         return;
+}
+
+void add_brnode(Brdecl *tmp){
+        if (!(br_decl == NULL)){
+                br_decl->next = tmp;
+        }
+        tmp->next = NULL;
+        tmp->before = br_decl;
+        br_decl = tmp;
 }
 
 %}
@@ -509,15 +521,22 @@ statement
         : assignment_statement
         |
         {
+                Brdecl *br_tmp;
+                br_tmp = (Brdecl *)malloc(sizeof(Brdecl));
+                add_brnode(br_tmp);
+        }
+        if_statement
+        {
                 LLVMcode *tmp;
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
-                tmp->command = BrUncond; /* 命令の種類を加算に設定 */
-                (tmp->args).bruncond.arg1 = Last_Register;
-                Last_Register ++;
+                tmp->command = Label; /* 命令の種類を加算に設定 */
+                (tmp->args).label.l = Last_Register;
                 add_node(tmp);
-        } 
-        if_statement
+                br_decl->uncoll = Last_Register;
+                Last_Register ++;
+                br_decl = br_decl->before;
+        }
         | 
         {
                 LLVMcode *tmp;
@@ -525,21 +544,49 @@ statement
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
                 tmp->command = BrUncond; /* 命令の種類を加算に設定 */
                 (tmp->args).bruncond.arg1 = Last_Register;
-                Last_Register ++;
                 add_node(tmp);
+                Brdecl *br_tmp;
+                br_tmp = (Brdecl *)malloc(sizeof(Brdecl));
+                add_brnode(br_tmp);
         }
         while_statement
-        |         
+        {
+                LLVMcode *tmp;
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Label; /* 命令の種類を加算に設定 */
+                (tmp->args).label.l = Last_Register;
+                add_node(tmp);
+                br_decl->uncoll = Last_Register;
+                Last_Register ++;
+                printf("%d, %d, %d\n", br_decl->cond, br_decl->coll, br_decl->uncoll);
+                br_decl = br_decl->before;
+                
+        }
+        |
         {
                 LLVMcode *tmp;
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
                 tmp->command = BrUncond; /* 命令の種類を加算に設定 */
                 (tmp->args).bruncond.arg1 = Last_Register;
-                Last_Register ++;
                 add_node(tmp);
+                Brdecl *br_tmp;
+                br_tmp = (Brdecl *)malloc(sizeof(Brdecl));
+                add_brnode(br_tmp);
         }
         for_statement
+        {
+                LLVMcode *tmp;
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Label; /* 命令の種類を加算に設定 */
+                (tmp->args).label.l = Last_Register;
+                add_node(tmp);
+                br_decl->uncoll = Last_Register;
+                Last_Register ++;
+                br_decl = br_decl->before;
+        }
         | proc_call_statement
         | null_statement
         | block_statement
@@ -564,17 +611,87 @@ assignment_statement
         ;
 
 if_statement 
-        : IF condition 
-        THEN statement else_statement
+        : IF 
+        {
+                if (codetl->command != Label){
+                LLVMcode *tmp;
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Label; /* 命令の種類を加算に設定 */
+                (tmp->args).label.l = Last_Register;
+                add_node(tmp);
+                Last_Register ++;
+                }
+        } condition 
+        THEN 
+        {
+                LLVMcode *tmp;
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Label; /* 命令の種類を加算に設定 */
+                (tmp->args).label.l = Last_Register;
+                add_node(tmp);
+                Last_Register ++;
+        } statement else_statement
         ;
 
 else_statement 
         : /* empty */
-        | ELSE statement
+        | ELSE 
+        {
+                LLVMcode *tmp;
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Label; /* 命令の種類を加算に設定 */
+                (tmp->args).label.l = Last_Register;
+                add_node(tmp);
+                Last_Register ++;
+        } statement
         ;
 
 while_statement 
-        : WHILE condition DO statement
+        : WHILE 
+        {
+                LLVMcode *tmp;
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Label; /* 命令の種類を加算に設定 */
+                (tmp->args).label.l = Last_Register;
+                add_node(tmp);
+                br_decl->cond = Last_Register;
+                Last_Register ++;
+        } condition 
+        {
+                LLVMcode *tmp;
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = BrCond; /* 命令の種類を加算に設定 */
+                Factor arg1;
+                arg1 = factorpop();
+                (tmp->args).brcond.arg1 = arg1;
+                (tmp->args).brcond.arg2 = &br_decl->coll;
+                (tmp->args).brcond.arg3 = &br_decl->uncoll;
+                br_decl->coll = Last_Register;
+                add_node(tmp);
+                printf("%d,%d\n",*tmp->args.brcond.arg2, br_decl->coll);
+        } DO 
+        {
+                LLVMcode *tmp;
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Label; /* 命令の種類を加算に設定 */
+                (tmp->args).label.l = Last_Register;
+                add_node(tmp);
+                Last_Register ++;
+        } statement
+        {
+                LLVMcode *tmp;
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = BrUncond; /* 命令の種類を加算に設定 */
+                (tmp->args).bruncond.arg1 = br_decl->cond;
+                add_node(tmp);
+        }
         ;
 
 for_statement 
