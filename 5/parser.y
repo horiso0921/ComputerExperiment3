@@ -134,6 +134,31 @@ void displayFactor( Factor factor ,FILE *fp){
         return;
 }
 
+void displayCmptype( Cmptype cmptype, FLLE *fp){
+        switch(cmptype){
+                case EQUAL:
+                        fprintf(fp,"eq" );
+                        break;
+                case NE:
+                        fprintf(fp,"ne" );
+                        break;
+                case SGT:
+                        fprintf(fp,"sgt" );
+                        break;
+                case SGE:
+                        fprintf(fp,"sge" );
+                        break;
+                case SLT:
+                        fprintf(fp,"slt" );
+                        break;
+                case SLE:
+                        fprintf(fp,"sle" );
+                        break;
+                default:
+                        break;
+        }
+}
+
 void displayLlvmcodes( LLVMcode *code ,FILE *fp){
         if( code == NULL ) return;
         if( code->command  != Global)fprintf(fp,"  ");
@@ -225,6 +250,14 @@ void displayLlvmcodes( LLVMcode *code ,FILE *fp){
                         }
                         fprintf(fp,"\n");
                         break;
+                case Icmp:
+                        displayFactor((code->args).ret.retval,fp);
+                        fprintf(fp," = icmp ");
+                        displayCmptype((code->args).ret.type,fp);
+                        fprintf(fp," i32 ");
+                        displayFactor((code->args).ret.arg1,fp);
+                        fprintf(fp,", ");
+                        displayFactor((code->args).ret.arg2,fp);
                 default:
                         fprintf(fp,"This is error");
                         break;
