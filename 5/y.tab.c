@@ -276,8 +276,10 @@ void displayLlvmcodes( LLVMcode *code ,FILE *fp){
                         displayFactor((code->args).icmp.arg1,fp);
                         fprintf(fp,", ");
                         displayFactor((code->args).icmp.arg2,fp);
+                        fprintf(fp,"\n");
+                        break;
                 default:
-                        fprintf(fp,"This is error");
+                        fprintf(fp,"This is error\n");
                         break;
         }
         displayLlvmcodes( code->next,fp );
@@ -326,7 +328,7 @@ void add_globalnode(LLVMcode *tmp){
         return;
 }
 
-#line 313 "parser.y"
+#line 315 "parser.y"
 #ifdef YYSTYPE
 #undef  YYSTYPE_IS_DECLARED
 #define YYSTYPE_IS_DECLARED 1
@@ -338,7 +340,7 @@ typedef union {
         char ident[MAXLENGTH+1];
 } YYSTYPE;
 #endif /* !YYSTYPE_IS_DECLARED */
-#line 341 "y.tab.c"
+#line 343 "y.tab.c"
 
 /* compatibility with bison */
 #ifdef YYPARSE_PARAM
@@ -667,14 +669,14 @@ typedef struct {
 } YYSTACKDATA;
 /* variables for the parser stack */
 static YYSTACKDATA yystack;
-#line 807 "parser.y"
+#line 917 "parser.y"
  
 
 void yyerror(char *s)
 {
   fprintf(stderr, "%s \nline=%d token=%s\n", s, yylineno, yytext);
 }
-#line 677 "y.tab.c"
+#line 679 "y.tab.c"
 
 #if YYDEBUG
 #include <stdio.h>		/* needed for printf */
@@ -881,11 +883,11 @@ yyreduce:
     switch (yyn)
     {
 case 1:
-#line 336 "parser.y"
+#line 338 "parser.y"
 	{init_fstack();}
 break;
 case 2:
-#line 337 "parser.y"
+#line 339 "parser.y"
 	{
                 LLVMcode *tmp;
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode));
@@ -910,7 +912,7 @@ case 2:
         }
 break;
 case 9:
-#line 381 "parser.y"
+#line 383 "parser.y"
 	{
                 Fundecl *tmp;
                 tmp = (Fundecl *)malloc(sizeof(Fundecl));
@@ -946,7 +948,7 @@ case 9:
         }
 break;
 case 10:
-#line 415 "parser.y"
+#line 417 "parser.y"
 	{
                 Fundecl *tmp;
                 tmp = (Fundecl *)malloc(sizeof(Fundecl));
@@ -983,7 +985,7 @@ case 10:
         }
 break;
 case 13:
-#line 458 "parser.y"
+#line 460 "parser.y"
 	{
                 LLVMcode *tmp;
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode));
@@ -996,7 +998,7 @@ case 13:
         }
 break;
 case 15:
-#line 476 "parser.y"
+#line 478 "parser.y"
 	{ 
                 insert(yystack.l_mark[0].ident, 2);
                 Fundecl *tmp;
@@ -1010,19 +1012,19 @@ case 15:
         }
 break;
 case 16:
-#line 490 "parser.y"
+#line 492 "parser.y"
 	{Proc_Term++;}
 break;
 case 17:
-#line 490 "parser.y"
+#line 492 "parser.y"
 	{delete(); Proc_Term--;}
 break;
 case 29:
-#line 511 "parser.y"
+#line 513 "parser.y"
 	{factorpush(lookup(yystack.l_mark[0].ident));}
 break;
 case 30:
-#line 512 "parser.y"
+#line 514 "parser.y"
 	{
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
                 Factor arg1, arg2; /* 加算の引数・結果 */
@@ -1037,11 +1039,11 @@ case 30:
         }
 break;
 case 35:
-#line 540 "parser.y"
+#line 542 "parser.y"
 	{lookup(yystack.l_mark[0].ident);}
 break;
 case 38:
-#line 549 "parser.y"
+#line 551 "parser.y"
 	{
                 LLVMcode *tmp;
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
@@ -1057,11 +1059,11 @@ case 38:
                 }
 break;
 case 40:
-#line 569 "parser.y"
+#line 571 "parser.y"
 	{factorpush(lookup(yystack.l_mark[0].ident));}
 break;
 case 41:
-#line 570 "parser.y"
+#line 572 "parser.y"
 	{
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
                 Factor arg1, retval; /* 加算の引数・結果 */
@@ -1080,7 +1082,7 @@ case 41:
         }
 break;
 case 42:
-#line 590 "parser.y"
+#line 592 "parser.y"
 	{
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
                 Factor arg1, retval; /* 加算の引数・結果 */
@@ -1098,8 +1100,134 @@ case 42:
                 add_node(tmp);  
         }
 break;
+case 44:
+#line 616 "parser.y"
+	{
+                LLVMcode *tmp; /* 生成した命令へのポインタ */
+                Factor arg1, arg2, retval; /* 加算の引数・結果 */
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Icmp; /* 命令の種類を加算に設定 */
+                arg2 = factorpop();/*スタックから第2引数をポップ*/
+                arg1 = factorpop();/*スタックから第1引数をポップ*/
+                retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
+                retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
+                Last_Register ++; /* カウンタをインクリメント */
+                (tmp->args).icmp.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).icmp.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).icmp.retval = retval; /* 結果のレジスタを指定 */
+                (tmp->args).icmp.type = EQUAL;
+                add_node(tmp);
+                factorpush( retval ); /* 加算の結果をスタックにプッシュ */
+        }
+break;
+case 45:
+#line 635 "parser.y"
+	{
+                LLVMcode *tmp; /* 生成した命令へのポインタ */
+                Factor arg1, arg2, retval; /* 加算の引数・結果 */
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Icmp; /* 命令の種類を加算に設定 */
+                arg2 = factorpop();/*スタックから第2引数をポップ*/
+                arg1 = factorpop();/*スタックから第1引数をポップ*/
+                retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
+                retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
+                Last_Register ++; /* カウンタをインクリメント */
+                (tmp->args).icmp.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).icmp.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).icmp.retval = retval; /* 結果のレジスタを指定 */
+                (tmp->args).icmp.type = NE;
+                add_node(tmp);
+                factorpush( retval ); /* 加算の結果をスタックにプッシュ */
+        }
+break;
+case 46:
+#line 654 "parser.y"
+	{
+                LLVMcode *tmp; /* 生成した命令へのポインタ */
+                Factor arg1, arg2, retval; /* 加算の引数・結果 */
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Icmp; /* 命令の種類を加算に設定 */
+                arg2 = factorpop();/*スタックから第2引数をポップ*/
+                arg1 = factorpop();/*スタックから第1引数をポップ*/
+                retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
+                retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
+                Last_Register ++; /* カウンタをインクリメント */
+                (tmp->args).icmp.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).icmp.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).icmp.retval = retval; /* 結果のレジスタを指定 */
+                (tmp->args).icmp.type = SLT;
+                add_node(tmp);
+                factorpush( retval ); /* 加算の結果をスタックにプッシュ */
+        }
+break;
+case 47:
+#line 673 "parser.y"
+	{
+                LLVMcode *tmp; /* 生成した命令へのポインタ */
+                Factor arg1, arg2, retval; /* 加算の引数・結果 */
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Icmp; /* 命令の種類を加算に設定 */
+                arg2 = factorpop();/*スタックから第2引数をポップ*/
+                arg1 = factorpop();/*スタックから第1引数をポップ*/
+                retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
+                retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
+                Last_Register ++; /* カウンタをインクリメント */
+                (tmp->args).icmp.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).icmp.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).icmp.retval = retval; /* 結果のレジスタを指定 */
+                (tmp->args).icmp.type = SLE;
+                add_node(tmp);
+                factorpush( retval ); /* 加算の結果をスタックにプッシュ */
+        }
+break;
+case 48:
+#line 692 "parser.y"
+	{
+                LLVMcode *tmp; /* 生成した命令へのポインタ */
+                Factor arg1, arg2, retval; /* 加算の引数・結果 */
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Icmp; /* 命令の種類を加算に設定 */
+                arg2 = factorpop();/*スタックから第2引数をポップ*/
+                arg1 = factorpop();/*スタックから第1引数をポップ*/
+                retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
+                retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
+                Last_Register ++; /* カウンタをインクリメント */
+                (tmp->args).icmp.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).icmp.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).icmp.retval = retval; /* 結果のレジスタを指定 */
+                (tmp->args).icmp.type = SGT;
+                add_node(tmp);
+                factorpush( retval ); /* 加算の結果をスタックにプッシュ */
+        }
+break;
+case 49:
+#line 711 "parser.y"
+	{
+                LLVMcode *tmp; /* 生成した命令へのポインタ */
+                Factor arg1, arg2, retval; /* 加算の引数・結果 */
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Icmp; /* 命令の種類を加算に設定 */
+                arg2 = factorpop();/*スタックから第2引数をポップ*/
+                arg1 = factorpop();/*スタックから第1引数をポップ*/
+                retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
+                retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
+                Last_Register ++; /* カウンタをインクリメント */
+                (tmp->args).icmp.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).icmp.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).icmp.retval = retval; /* 結果のレジスタを指定 */
+                (tmp->args).icmp.type = SGE;
+                add_node(tmp);
+                factorpush( retval ); /* 加算の結果をスタックにプッシュ */
+        }
+break;
 case 52:
-#line 625 "parser.y"
+#line 735 "parser.y"
 	{
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
                 Factor arg1, arg2, retval; /* 加算の引数・結果 */
@@ -1120,7 +1248,7 @@ case 52:
         }
 break;
 case 53:
-#line 644 "parser.y"
+#line 754 "parser.y"
 	{
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
                 Factor arg1, arg2, retval; /* 加算の引数・結果 */
@@ -1140,7 +1268,7 @@ case 53:
         }
 break;
 case 54:
-#line 662 "parser.y"
+#line 772 "parser.y"
 	{
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
                 Factor arg1, arg2, retval; /* 加算の引数・結果 */
@@ -1160,7 +1288,7 @@ case 54:
         }
 break;
 case 56:
-#line 684 "parser.y"
+#line 794 "parser.y"
 	{
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
                 Factor arg1, arg2, retval; /* 加算の引数・結果 */
@@ -1180,7 +1308,7 @@ case 56:
         }
 break;
 case 57:
-#line 703 "parser.y"
+#line 813 "parser.y"
 	{
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
                 Factor arg1, arg2, retval; /* 加算の引数・結果 */
@@ -1200,7 +1328,7 @@ case 57:
         }
 break;
 case 58:
-#line 725 "parser.y"
+#line 835 "parser.y"
 	{
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
                 Factor arg1, retval; /* 加算の引数・結果 */
@@ -1218,7 +1346,7 @@ case 58:
         }
 break;
 case 59:
-#line 741 "parser.y"
+#line 851 "parser.y"
 	{
                 Factor tmp;
                 tmp.type=CONSTANT;
@@ -1227,11 +1355,11 @@ case 59:
         }
 break;
 case 61:
-#line 751 "parser.y"
+#line 861 "parser.y"
 	{factorpush(lookup(yystack.l_mark[0].ident));}
 break;
 case 64:
-#line 761 "parser.y"
+#line 871 "parser.y"
 	{ 
                 Factor tmp;
                 tmp = insert(yystack.l_mark[0].ident, 0); 
@@ -1256,7 +1384,7 @@ case 64:
         }
 break;
 case 65:
-#line 784 "parser.y"
+#line 894 "parser.y"
 	{ 
                 Factor tmp;
                 tmp = insert(yystack.l_mark[0].ident, 0); 
@@ -1279,7 +1407,7 @@ case 65:
                 }
         }
 break;
-#line 1282 "y.tab.c"
+#line 1410 "y.tab.c"
     }
     yystack.s_mark -= yym;
     yystate = *yystack.s_mark;

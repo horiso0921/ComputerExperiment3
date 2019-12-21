@@ -258,8 +258,10 @@ void displayLlvmcodes( LLVMcode *code ,FILE *fp){
                         displayFactor((code->args).icmp.arg1,fp);
                         fprintf(fp,", ");
                         displayFactor((code->args).icmp.arg2,fp);
+                        fprintf(fp,"\n");
+                        break;
                 default:
-                        fprintf(fp,"This is error");
+                        fprintf(fp,"This is error\n");
                         break;
         }
         displayLlvmcodes( code->next,fp );
@@ -622,10 +624,10 @@ condition
                 retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
                 retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
                 Last_Register ++; /* カウンタをインクリメント */
-                (tmp->args).add.arg1 = arg1; /* 命令の第 1 引数を指定 */
-                (tmp->args).add.arg2 = arg2; /* 命令の第 2 引数を指定 */
-                (tmp->args).add.retval = retval; /* 結果のレジスタを指定 */
-                (tmp->args).add.type = EQUAL;
+                (tmp->args).icmp.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).icmp.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).icmp.retval = retval; /* 結果のレジスタを指定 */
+                (tmp->args).icmp.type = EQUAL;
                 add_node(tmp);
                 factorpush( retval ); /* 加算の結果をスタックにプッシュ */
         }
@@ -641,10 +643,10 @@ condition
                 retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
                 retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
                 Last_Register ++; /* カウンタをインクリメント */
-                (tmp->args).add.arg1 = arg1; /* 命令の第 1 引数を指定 */
-                (tmp->args).add.arg2 = arg2; /* 命令の第 2 引数を指定 */
-                (tmp->args).add.retval = retval; /* 結果のレジスタを指定 */
-                (tmp->args).add.type = NE;
+                (tmp->args).icmp.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).icmp.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).icmp.retval = retval; /* 結果のレジスタを指定 */
+                (tmp->args).icmp.type = NE;
                 add_node(tmp);
                 factorpush( retval ); /* 加算の結果をスタックにプッシュ */
         }
@@ -660,10 +662,10 @@ condition
                 retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
                 retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
                 Last_Register ++; /* カウンタをインクリメント */
-                (tmp->args).add.arg1 = arg1; /* 命令の第 1 引数を指定 */
-                (tmp->args).add.arg2 = arg2; /* 命令の第 2 引数を指定 */
-                (tmp->args).add.retval = retval; /* 結果のレジスタを指定 */
-                (tmp->args).add.type = SGT;
+                (tmp->args).icmp.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).icmp.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).icmp.retval = retval; /* 結果のレジスタを指定 */
+                (tmp->args).icmp.type = SLT;
                 add_node(tmp);
                 factorpush( retval ); /* 加算の結果をスタックにプッシュ */
         }
@@ -679,10 +681,10 @@ condition
                 retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
                 retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
                 Last_Register ++; /* カウンタをインクリメント */
-                (tmp->args).add.arg1 = arg1; /* 命令の第 1 引数を指定 */
-                (tmp->args).add.arg2 = arg2; /* 命令の第 2 引数を指定 */
-                (tmp->args).add.retval = retval; /* 結果のレジスタを指定 */
-                (tmp->args).add.type = SGE;
+                (tmp->args).icmp.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).icmp.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).icmp.retval = retval; /* 結果のレジスタを指定 */
+                (tmp->args).icmp.type = SLE;
                 add_node(tmp);
                 factorpush( retval ); /* 加算の結果をスタックにプッシュ */
         }
@@ -698,10 +700,10 @@ condition
                 retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
                 retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
                 Last_Register ++; /* カウンタをインクリメント */
-                (tmp->args).add.arg1 = arg1; /* 命令の第 1 引数を指定 */
-                (tmp->args).add.arg2 = arg2; /* 命令の第 2 引数を指定 */
-                (tmp->args).add.retval = retval; /* 結果のレジスタを指定 */
-                (tmp->args).add.type = SLT;
+                (tmp->args).icmp.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).icmp.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).icmp.retval = retval; /* 結果のレジスタを指定 */
+                (tmp->args).icmp.type = SGT;
                 add_node(tmp);
                 factorpush( retval ); /* 加算の結果をスタックにプッシュ */
         }
@@ -717,10 +719,10 @@ condition
                 retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
                 retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
                 Last_Register ++; /* カウンタをインクリメント */
-                (tmp->args).add.arg1 = arg1; /* 命令の第 1 引数を指定 */
-                (tmp->args).add.arg2 = arg2; /* 命令の第 2 引数を指定 */
-                (tmp->args).add.retval = retval; /* 結果のレジスタを指定 */
-                (tmp->args).add.type = SLE;
+                (tmp->args).icmp.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).icmp.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).icmp.retval = retval; /* 結果のレジスタを指定 */
+                (tmp->args).icmp.type = SGE;
                 add_node(tmp);
                 factorpush( retval ); /* 加算の結果をスタックにプッシュ */
         }

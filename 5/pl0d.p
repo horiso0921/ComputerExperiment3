@@ -3,8 +3,6 @@ var n, temp;
 procedure fact;
 var m;
 begin
-    m := 1;
-    m := -m;
     if n <= 1 then
         temp:=1
     else

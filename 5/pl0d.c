@@ -2,8 +2,6 @@
 int n,tmp;
 void fact(){
     int m;
-    m = 1;
-    m = - m;
     if (n <= 1){
         tmp = 1;
     }else{

@@ -10,32 +10,28 @@ target triple = "x86_64-unknown-linux-gnu"
 ; Function Attrs: noinline nounwind optnone uwtable
 define dso_local void @fact() #0 {
   %1 = alloca i32, align 4
-  store i32 1, i32* %1, align 4
-  %2 = load i32, i32* %1, align 4
-  %3 = sub nsw i32 0, %2
-  store i32 %3, i32* %1, align 4
-  %4 = load i32, i32* @n, align 4
-  %5 = icmp sle i32 %4, 1
-  br i1 %5, label %6, label %7
+  %2 = load i32, i32* @n, align 4
+  %3 = icmp sle i32 %2, 1
+  br i1 %3, label %4, label %5
 
-6:                                                ; preds = %0
+4:                                                ; preds = %0
   store i32 1, i32* @tmp, align 4
-  br label %14
+  br label %12
 
-7:                                                ; preds = %0
-  %8 = load i32, i32* @n, align 4
-  store i32 %8, i32* %1, align 4
-  %9 = load i32, i32* @n, align 4
-  %10 = sub nsw i32 %9, 1
-  store i32 %10, i32* @n, align 4
+5:                                                ; preds = %0
+  %6 = load i32, i32* @n, align 4
+  store i32 %6, i32* %1, align 4
+  %7 = load i32, i32* @n, align 4
+  %8 = sub nsw i32 %7, 1
+  store i32 %8, i32* @n, align 4
   call void @fact()
-  %11 = load i32, i32* @tmp, align 4
-  %12 = load i32, i32* %1, align 4
-  %13 = mul nsw i32 %11, %12
-  store i32 %13, i32* @tmp, align 4
-  br label %14
+  %9 = load i32, i32* @tmp, align 4
+  %10 = load i32, i32* %1, align 4
+  %11 = mul nsw i32 %9, %10
+  store i32 %11, i32* @tmp, align 4
+  br label %12
 
-14:                                               ; preds = %7, %6
+12:                                               ; preds = %5, %4
   ret void
 }
 
