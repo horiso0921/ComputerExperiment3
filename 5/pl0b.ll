@@ -4,7 +4,8 @@ target datalayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-unknown-linux-gnu"
 
 @x = common dso_local global i32 0, align 4
-@.str = private unnamed_addr constant [3 x i8] c"%d\00", align 1
+@.str = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
+@.str.1 = private unnamed_addr constant [3 x i8] c"%d\00", align 1
 @n = common dso_local global i32 0, align 4
 
 ; Function Attrs: noinline nounwind optnone uwtable
@@ -32,14 +33,26 @@ define dso_local void @prime() #0 {
   br label %4
 
 15:                                               ; preds = %4
+  %16 = load i32, i32* %1, align 4
+  %17 = icmp eq i32 %16, 1
+  br i1 %17, label %18, label %21
+
+18:                                               ; preds = %15
+  %19 = load i32, i32* @x, align 4
+  %20 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.str, i64 0, i64 0), i32 %19)
+  br label %21
+
+21:                                               ; preds = %18, %15
   ret void
 }
+
+declare dso_local i32 @printf(i8*, ...) #1
 
 ; Function Attrs: noinline nounwind optnone uwtable
 define dso_local i32 @main() #0 {
   %1 = alloca i32, align 4
   store i32 0, i32* %1, align 4
-  %2 = call i32 (i8*, ...) @__isoc99_scanf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str, i64 0, i64 0), i32* @n)
+  %2 = call i32 (i8*, ...) @__isoc99_scanf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str.1, i64 0, i64 0), i32* @n)
   br label %3
 
 3:                                                ; preds = %6, %0

@@ -561,7 +561,7 @@ statement
                 Last_Register ++;
                 printf("%d, %d, %d\n", br_decl->cond, br_decl->coll, br_decl->uncoll);
                 br_decl = br_decl->before;
-                
+
         }
         |
         {
@@ -623,6 +623,19 @@ if_statement
                 Last_Register ++;
                 }
         } condition 
+        {
+                LLVMcode *tmp;
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = BrCond; /* 命令の種類を加算に設定 */
+                Factor arg1;
+                arg1 = factorpop();
+                (tmp->args).brcond.arg1 = arg1;
+                (tmp->args).brcond.arg2 = &br_decl->coll;
+                (tmp->args).brcond.arg3 = &br_decl->uncoll;
+                br_decl->coll = Last_Register;
+                add_node(tmp);
+        }
         THEN 
         {
                 LLVMcode *tmp;
@@ -633,6 +646,14 @@ if_statement
                 add_node(tmp);
                 Last_Register ++;
         } statement else_statement
+        {
+                LLVMcode *tmp;
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = BrUncond; /* 命令の種類を加算に設定 */
+                (tmp->args).bruncond.arg1 = Last_Register;
+                add_node(tmp);
+        }
         ;
 
 else_statement 
@@ -652,12 +673,15 @@ else_statement
 while_statement 
         : WHILE 
         {
+                
+                if (codetl->command != Label){
                 LLVMcode *tmp;
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
                 tmp->command = Label; /* 命令の種類を加算に設定 */
                 (tmp->args).label.l = Last_Register;
                 add_node(tmp);
+                }
                 br_decl->cond = Last_Register;
                 Last_Register ++;
         } condition 
@@ -673,7 +697,6 @@ while_statement
                 (tmp->args).brcond.arg3 = &br_decl->uncoll;
                 br_decl->coll = Last_Register;
                 add_node(tmp);
-                printf("%d,%d\n",*tmp->args.brcond.arg2, br_decl->coll);
         } DO 
         {
                 LLVMcode *tmp;
@@ -695,7 +718,19 @@ while_statement
         ;
 
 for_statement 
-        : FOR IDENT {lookup($2);} ASSIGN expression
+        : FOR IDENT {factorpush(lookup($2));} ASSIGN expression
+        {
+                LLVMcode *tmp; /* 生成した命令へのポインタ */
+                Factor arg1, arg2; /* 加算の引数・結果 */
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Store; /* 命令の種類を加算に設定 */
+                arg1 = factorpop();/*スタックから第2引数をポップ*/
+                arg2 = factorpop();/*スタックから第1引数をポップ*/
+                (tmp->args).store.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).store.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                add_node(tmp);
+        }
                 TO expression DO statement 
         ;
 
