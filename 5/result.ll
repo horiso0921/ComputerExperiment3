@@ -7,18 +7,22 @@ declare i32 @printf(i8*, ...)
 
 define void @fact() {
   %1 = alloca i32, align 4
-  %2 = load i32, i32* @n, align 4
-  store i32 1, i32* @temp, align 4
-  %3 = load i32, i32* @n, align 4
+  store i32 1, i32* %1, align 4
+  %2 = load i32, i32* %1, align 4
+  %3 = sub nsw i32 0, %2
   store i32 %3, i32* %1, align 4
   %4 = load i32, i32* @n, align 4
-  %5 = sub nsw i32 %4, 1
-  store i32 %5, i32* @n, align 4
+  store i32 1, i32* @temp, align 4
+  %5 = load i32, i32* @n, align 4
+  store i32 %5, i32* %1, align 4
+  %6 = load i32, i32* @n, align 4
+  %7 = sub nsw i32 %6, 1
+  store i32 %7, i32* @n, align 4
   call void @fact()
-  %6 = load i32, i32* @temp, align 4
-  %7 = load i32, i32* %1, align 4
-  %8 = mul nsw i32 %6, %7
-  store i32 %8, i32* @temp, align 4
+  %8 = load i32, i32* @temp, align 4
+  %9 = load i32, i32* %1, align 4
+  %10 = mul nsw i32 %8, %9
+  store i32 %10, i32* @temp, align 4
   ret void
 }
 

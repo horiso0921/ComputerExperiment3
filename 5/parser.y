@@ -622,6 +622,24 @@ expression
         : term
         | PLUS term
         | MINUS term
+        {
+                LLVMcode *tmp; /* 生成した命令へのポインタ */
+                Factor arg1, arg2, retval; /* 加算の引数・結果 */
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Sub; /* 命令の種類を加算に設定 */
+                arg2 = factorpop();/*スタックから第2引数をポップ*/
+                arg1.type = CONSTANT;/*第1引数*/
+                arg1.cal = 0;
+                retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
+                retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
+                Last_Register ++; /* カウンタをインクリメント */
+                (tmp->args).sub.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).sub.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).sub.retval = retval; /* 結果のレジスタを指定 */
+                add_node(tmp);
+                factorpush( retval ); /* 加算の結果をスタックにプッシュ */
+        }
         | expression PLUS term
         {
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
