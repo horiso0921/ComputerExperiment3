@@ -15,5 +15,5 @@ void fact(){
 int main(){
     scanf("%d",&n);
     fact();
-    printf("%d",tmp);
+    printf("%d\n",tmp);
 }

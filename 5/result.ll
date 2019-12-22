@@ -9,7 +9,7 @@ define void @fact() {
   %1 = alloca i32, align 4
   %2 = load i32, i32* @n, align 4
   %3 = icmp sle i32 %2, 1
-  br i1 %3, label %4, label %12
+  br i1 %3, label %4, label %5
 
 4:
   store i32 1, i32* @temp, align 4

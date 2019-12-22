@@ -147,7 +147,7 @@ Fundecl *decltl = NULL;
 Fundecl *global_decl = NULL;
 
 typedef struct brdecl{
-  int cond; int coll; int uncoll; int inc;
+  int cond; int coll; int uncoll; int inc; int end;
   struct brdecl *next;
   struct brdecl *before;
 } Brdecl;

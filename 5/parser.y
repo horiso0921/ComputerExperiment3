@@ -189,7 +189,7 @@ statement
         if_statement
         {
                 create_llvmcode(Label);
-                br_decl->uncoll = Last_Register;
+                br_decl->end = Last_Register;
                 Last_Register ++;
                 br_decl = br_decl->before;
         }
@@ -240,16 +240,21 @@ if_statement
         {
                 create_llvmcode(BrCond);
         }
-        THEN 
+                THEN 
         {
                 create_llvmcode(Label);
                 Last_Register ++;
-        } statement else_statement
+        }
+                statement 
+        {
+                br_decl->uncoll = Last_Register;
+        }
+                else_statement
         {
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode));
                 tmp->command = BrUncond;
                 tmp->next = NULL;
-                (tmp->args).bruncond.arg1 = &br_decl->uncoll;
+                (tmp->args).bruncond.arg1 = &br_decl->end;
                 add_llvmnode(tmp);
         }
         ;
@@ -261,7 +266,7 @@ else_statement
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode));
                 tmp->command = BrUncond;
                 tmp->next = NULL;
-                (tmp->args).bruncond.arg1 = &br_decl->uncoll;
+                (tmp->args).bruncond.arg1 = &br_decl->end;
                 add_llvmnode(tmp);
                 create_llvmcode(Label);
                 Last_Register ++;
