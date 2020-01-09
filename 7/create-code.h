@@ -79,18 +79,22 @@ void create_llvmcode(LLVMcommand command){
 }
 
 void Arity_Alloca(){
+    int r;
     Tmp = decltl->codes;
     Stack_tmp = Stack_tl;
+    printf("%d",Last_Register);
     while (Tmp != NULL){
-        (Tmp->args).alloca.retval.cal += decltl->arity;
-        Stack_tmp->cal += decltl->arity;
+        (Tmp->args).alloca.retval.cal += decltl->arity ;
         Tmp = Tmp->next;
+    }
+    while (Stack_tmp->type != PROC_NAME){
+        Stack_tmp->cal += decltl->arity ;
         Stack_tmp = Stack_tmp->before;
     }
     Tmp = decltl->codes;
     if (Func_Term) {
-        Tmp = Tmp->next;
         Stack_tmp->ret = decltl->arity + 1;
+        Tmp = Tmp->next;
     }
     for (i=0;i<decltl->arity;i++){
         f_tmp.type = LOCAL_VAR;
@@ -100,13 +104,8 @@ void Arity_Alloca(){
         create_llvmcode(Store);
         Tmp = Tmp->next;
     }
-    Last_Register += decltl->arity;
-    Factor *fact;
-    fact = Stack_tl;
-    while (strcmp(fact->val, decltl->fname)){
-        fact = fact->before;
-    }
-    fact->cal = decltl->arity;
+    Last_Register += decltl->arity ;
+    lookall(Stack_tl);
 }
 
 

@@ -27,6 +27,7 @@ int i;
 int if_flg;
 int Func_Term = 0;
 
+
 %}
 
 %union {
@@ -75,7 +76,7 @@ program
         ;
 
 outblock
-        : var_decl_part subprog_decl_part statement
+        : var_decl_part subprog_decl_part statement 
         ;
 
 var_decl_part
@@ -182,6 +183,7 @@ proc_name
                 strcpy(tmp->fname , $1);
                 tmp->codes = NULL;
                 tmp->arity = 0;
+                tmp->rettype = vo;
                 if (declhd == NULL) declhd = tmp;
                 if (decltl != NULL) decltl->next = tmp;
                 decltl = tmp; 
@@ -203,12 +205,18 @@ func_name
                 strcpy(tmp->fname , $1);
                 tmp->codes = NULL;
                 tmp->arity = 0;
+                tmp->rettype = I32;
                 if (declhd == NULL) declhd = tmp;
                 if (decltl != NULL) decltl->next = tmp;
                 decltl = tmp; 
                 codetl = NULL;
                 Proc_Term++;
                 Func_Term++;
+                Factor f_tmp;
+                f_tmp.type = LOCAL_VAR;
+                f_tmp.cal = Last_Register++;
+                factorpush(f_tmp);
+                create_llvmcode(Alloca);
         }
         ;
 inblock
@@ -295,10 +303,11 @@ assignment_statement
         {
                 Factor tmp;
                 tmp = lookup($1);
-                if (!strcmp($1,decltl->fname)) {
-                        tmp.cal = tmp.ret;
+                if (tmp.type == PROC_NAME) {
+                        tmp.cal = decltl->arity+1;
                         tmp.type = LOCAL_VAR;
                 }
+                
                 factorpush(tmp);
         }
         ASSIGN expression 
@@ -464,14 +473,6 @@ proc_call_name
         : IDENT {factorpush(lookup($1));}
         ;
 
-func_call_statement
-        : func_call_name
-        | func_call_name LPAREN arg_list RPAREN
-        ;
-
-func_call_name 
-        : IDENT {factorpush(lookup($1));}
-        ;
 
 block_statement
         : SBEGIN statement_list SEND
@@ -514,6 +515,7 @@ write_statement
                 (tmp->args).call.retval = retval; /* 命令の第 2 引数を指定 */
                 (tmp->args).call.rettype = I32;
                 add_llvmnode(tmp);
+                
         }
         ;
 
@@ -601,18 +603,20 @@ factor
         {
                 Factor tmp;
                 tmp.type=CONSTANT;
+                
                 tmp.cal=$1;
                 factorpush(tmp);
         }
         | LPAREN expression RPAREN
-        | func_call_statement
-        {
+        | func_call
+        {       
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
                 tmp->command = Call; /* 命令の種類を加算に設定 */
                 Factor arg;
                 for (i = 0; i < 11;i++){
                         arg = factorpop();
+                        printf("%d",arg.type);
                         if(arg.type == PROC_NAME){
                                 break;
                         }
@@ -625,11 +629,23 @@ factor
                 retval.cal = Last_Register++;
                 (tmp->args).call.retval = retval;
                 add_llvmnode(tmp);
+                factorpush(retval);
         }
         ;
 
-var_name 
+func_call
+        : func_call_name LPAREN arg_list RPAREN
+        ;
+
+func_call_name 
         : IDENT {factorpush(lookup($1));}
+        ;
+
+var_name 
+        : IDENT 
+        {
+                factorpush(lookup($1));
+        }
         ;
 
 arg_list 

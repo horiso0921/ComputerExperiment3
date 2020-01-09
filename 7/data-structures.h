@@ -135,6 +135,7 @@ void factorpush(Factor x) {
 /* LLVMの関数定義 */
 typedef struct fundecl {
   char fname[256];      /* 関数名                      */
+  rtype rettype;        /* 関数か手続きかの別           */
   unsigned int arity;   /* 引数個数                    */ 
   Factor args[10];      /* 引数名                      */
   LLVMcode *codes;      /* 命令列の線形リストへのポインタ */

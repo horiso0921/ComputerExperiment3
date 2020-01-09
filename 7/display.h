@@ -135,8 +135,8 @@ void displayLlvmcodes( LLVMcode *code){
                                         fprintf(fp,"(");
                                 } else {
                                         fprintf(fp,"(i32 ");
-                                        displayFactor((code->args).call.args[0]);
-                                        for (int k=1; k < i;k++){
+                                        displayFactor((code->args).call.args[i-1]);
+                                        for (int k=i-2; k >= 0;k--){
                                                 fprintf(fp, ", i32 ");
                                                 displayFactor( (code->args).call.args[k]);
                                         }
@@ -173,7 +173,11 @@ void displayLlvmcodes( LLVMcode *code){
 void displayLlvmfundecl( Fundecl *decl ){
         if( decl == NULL ) return;
         if (strcmp(decl->fname, "main")){
-                fprintf(fp, "define void @%s(", decl->fname);
+                if (decl->rettype == I32){
+                        fprintf(fp, "define i32 @%s(", decl->fname);
+                } else {
+                        fprintf(fp, "define void @%s(", decl->fname);
+                }
                 if (decl->arity){fprintf(fp, "i32");}
                 for (i = 1; i < decl->arity; i++){
                         fprintf(fp, ", i32");

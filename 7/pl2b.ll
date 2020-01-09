@@ -1,45 +1,52 @@
-; ModuleID = 'samples/pl2a.c'
-source_filename = "samples/pl2a.c"
+; ModuleID = 'samples/pl2b.c'
+source_filename = "samples/pl2b.c"
 target datalayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-unknown-linux-gnu"
 
 @.str = private unnamed_addr constant [3 x i8] c"%d\00", align 1
+@m = common dso_local global i32 0, align 4
 @n = common dso_local global i32 0, align 4
-@.str.1 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
 
 ; Function Attrs: noinline nounwind optnone uwtable
-define dso_local i32 @fact(i32) #0 {
-  %2 = alloca i32, align 4
+define dso_local i32 @power(i32, i32) #0 {
   %3 = alloca i32, align 4
-  store i32 %0, i32* %3, align 4
-  %4 = load i32, i32* %3, align 4
-  %5 = icmp sle i32 %4, 0
-  br i1 %5, label %6, label %7
+  %4 = alloca i32, align 4
+  %5 = alloca i32, align 4
+  store i32 %0, i32* %4, align 4
+  store i32 %1, i32* %5, align 4
+  %6 = load i32, i32* %5, align 4
+  %7 = icmp sle i32 %6, 0
+  br i1 %7, label %8, label %9
 
-6:                                                ; preds = %1
-  store i32 1, i32* %2, align 4
-  br label %13
+8:                                                ; preds = %2
+  store i32 1, i32* %3, align 4
+  br label %16
 
-7:                                                ; preds = %1
-  %8 = load i32, i32* %3, align 4
-  %9 = sub nsw i32 %8, 1
-  %10 = call i32 @fact(i32 %9)
-  %11 = load i32, i32* %3, align 4
-  %12 = mul nsw i32 %10, %11
-  store i32 %12, i32* %2, align 4
-  br label %13
+9:                                                ; preds = %2
+  %10 = load i32, i32* %4, align 4
+  %11 = load i32, i32* %5, align 4
+  %12 = sub nsw i32 %11, 1
+  %13 = call i32 @power(i32 %10, i32 %12)
+  %14 = load i32, i32* %4, align 4
+  %15 = mul nsw i32 %13, %14
+  store i32 %15, i32* %3, align 4
+  br label %16
 
-13:                                               ; preds = %7, %6
-  %14 = load i32, i32* %2, align 4
-  ret i32 %14
+16:                                               ; preds = %9, %8
+  %17 = load i32, i32* %3, align 4
+  ret i32 %17
 }
 
 ; Function Attrs: noinline nounwind optnone uwtable
 define dso_local i32 @main() #0 {
-  %1 = call i32 (i8*, ...) @__isoc99_scanf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str, i64 0, i64 0), i32* @n)
-  %2 = load i32, i32* @n, align 4
-  %3 = call i32 @fact(i32 %2)
-  %4 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.str.1, i64 0, i64 0), i32 %3)
+  %1 = alloca i32, align 4
+  store i32 0, i32* %1, align 4
+  %2 = call i32 (i8*, ...) @__isoc99_scanf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str, i64 0, i64 0), i32* @m)
+  %3 = call i32 (i8*, ...) @__isoc99_scanf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str, i64 0, i64 0), i32* @n)
+  %4 = load i32, i32* @m, align 4
+  %5 = load i32, i32* @n, align 4
+  %6 = call i32 @power(i32 %4, i32 %5)
+  %7 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str, i64 0, i64 0), i32 %6)
   ret i32 0
 }
 

@@ -40,9 +40,9 @@ Factor insert(char *name, int flag) {
                 Stack_tl->next = tmp;
         }
         Stack_tl = tmp;
-        // printf("======================\n");
-        // lookall(Stack_hd);
-        // printf("======================\n");
+        printf("======================\n");
+        lookall(Stack_hd);
+        printf("======================\n");
         Factor res;
         res.type = tmp->type;
         res.cal = tmp->cal;
@@ -56,20 +56,21 @@ Factor lookup(char *name){
         while (strcmp(fact->val, name)){
                 fact = fact->before;
         }
-        // switch (fact->type) {
-        //         case GLOBAL_VAR:
-        //                 printf("FOUND == GLOBAL       %s\n", fact->val);
-        //                 break;
-        //         case LOCAL_VAR:
-        //                 printf("FOUND == LOCAL    %d   %s\n", fact->cal, fact->val);
-        //                 break;
-        //         case PROC_NAME:
-        //                 printf("FOUND == PROC         %s\n", fact->val);
-        //                 break;
-        // }
+        switch (fact->type) {
+                case GLOBAL_VAR:
+                        printf("FOUND == GLOBAL       %s\n", fact->val);
+                        break;
+                case LOCAL_VAR:
+                        printf("FOUND == LOCAL    %d   %s\n", fact->cal, fact->val);
+                        break;
+                case PROC_NAME:
+                        printf("FOUND == PROC     %d  %s\n",fact->ret, fact->val) ;
+                        break;
+        }
         Factor res;
         res.type = fact->type;
         res.cal = fact->cal;
+        res.ret = fact->ret;
         strcpy(res.val, name);
         return res;
 }
@@ -83,9 +84,13 @@ void delete(){
                 Stack_tl = tmp;
                 Stack_tl->next = NULL;
         }
-        // printf("======================\n");
-        // lookall(Stack_hd);
-        // printf("======================\n");
+        printf("%d",Stack_tl->ret);
+        if (Stack_tl->type == PROC_NAME){
+                Stack_tl->cal = decltl->arity;
+        }
+        printf("======================\n");
+        lookall(Stack_hd);
+        printf("======================\n");
         Last_Register = 1;
 }
 
