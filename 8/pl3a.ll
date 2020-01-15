@@ -14,39 +14,30 @@ target triple = "x86_64-unknown-linux-gnu"
 define dso_local void @initialize(i32) #0 {
   %2 = alloca i32, align 4
   %3 = alloca i32, align 4
-  %4 = alloca [101 x i32], align 16
   store i32 %0, i32* %2, align 4
   store i32 1, i32* %3, align 4
-  br label %5
+  br label %4
 
-5:                                                ; preds = %21, %1
-  %6 = load i32, i32* %3, align 4
-  %7 = load i32, i32* %2, align 4
-  %8 = icmp sle i32 %6, %7
-  br i1 %8, label %9, label %24
+4:                                                ; preds = %13, %1
+  %5 = load i32, i32* %3, align 4
+  %6 = load i32, i32* %2, align 4
+  %7 = icmp sle i32 %5, %6
+  br i1 %7, label %8, label %16
 
-9:                                                ; preds = %5
-  %10 = load i32, i32* %3, align 4
-  %11 = sext i32 %10 to i64
-  %12 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %11
-  %13 = call i32 (i8*, ...) @__isoc99_scanf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str, i64 0, i64 0), i32* %12)
+8:                                                ; preds = %4
+  %9 = load i32, i32* %3, align 4
+  %10 = sext i32 %9 to i64
+  %11 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %10
+  %12 = call i32 (i8*, ...) @__isoc99_scanf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str, i64 0, i64 0), i32* %11)
+  br label %13
+
+13:                                               ; preds = %8
   %14 = load i32, i32* %3, align 4
-  %15 = sext i32 %14 to i64
-  %16 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %15
-  %17 = load i32, i32* %16, align 4
-  %18 = load i32, i32* %3, align 4
-  %19 = sext i32 %18 to i64
-  %20 = getelementptr inbounds [101 x i32], [101 x i32]* %4, i64 0, i64 %19
-  store i32 %17, i32* %20, align 4
-  br label %21
+  %15 = add nsw i32 %14, 1
+  store i32 %15, i32* %3, align 4
+  br label %4
 
-21:                                               ; preds = %9
-  %22 = load i32, i32* %3, align 4
-  %23 = add nsw i32 %22, 1
-  store i32 %23, i32* %3, align 4
-  br label %5
-
-24:                                               ; preds = %5
+16:                                               ; preds = %4
   ret void
 }
 

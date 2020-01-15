@@ -2,10 +2,8 @@
 int i,j,n,a[101];
 void initialize(n){
     int i;
-    int b[101];
     for (i = 1; i <= n; i++){
         scanf("%d",&a[i]);
-        b[i] = a[i];
     }
 }
 

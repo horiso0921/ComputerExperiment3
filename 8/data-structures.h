@@ -22,7 +22,7 @@ typedef enum {
   Div,      /* div    */
   Icmp,     /* icmp   */
   Call,      /* call   */
-  Re,       /* ret    */
+  Ret,       /* ret    */
   Sext,      /* sext   */
   GetElem      /* getelem  */
 } LLVMcommand;
@@ -113,7 +113,6 @@ typedef struct llvmcode {
     struct { /* getelem    */
       Factor arg1; Factor arg2; Factor retval;
     } getelem;
-    
   } args;
   /* 次の命令へのポインタ */
   struct llvmcode *next;

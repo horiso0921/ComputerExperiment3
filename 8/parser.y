@@ -105,6 +105,7 @@ subprog_decl_part
                 Factor ftmp;
                 ftmp.type = LOCAL_VAR;
                 ftmp.cal = Last_Register;
+                ftmp.range = 0;
                 factorpush(ftmp);
                 Last_Register++;
                 create_llvmcode(Alloca);
@@ -127,6 +128,7 @@ subprog_decl_part
                 Factor ftmp;
                 ftmp.type = LOCAL_VAR;
                 ftmp.cal = Last_Register;
+                ftmp.range = 0;
                 factorpush(ftmp);
                 Last_Register++;
                 create_llvmcode(Alloca);
@@ -160,6 +162,7 @@ subprog_decl
                 tmp = lookup(decltl->fname);
                 arg1.type = LOCAL_VAR;
                 arg1.cal = tmp.ret;
+                arg1.range = 0;
                 factorpush(arg1);
                 create_llvmcode(Load);
                 create_llvmcode(Ret);                
@@ -215,6 +218,7 @@ func_name
                 Factor f_tmp;
                 f_tmp.type = LOCAL_VAR;
                 f_tmp.cal = Last_Register++;
+                f_tmp.range = 0;
                 factorpush(f_tmp);
                 create_llvmcode(Alloca);
         }
@@ -307,8 +311,11 @@ assignment_statement
         ;
 
 variable
-        : entire_variable 
+        : entire_variable
         | component_variable
+        {
+                create_llvmcode(GetElem);
+        }
         ;
 
 entire_variable
@@ -329,7 +336,7 @@ component_variable
 indexed_variable
         : array_variable LBRACKET expression 
         {
-                
+                create_llvmcode(Sext);
         }
         RBRACKET
         ;
@@ -501,8 +508,8 @@ block_statement
         : SBEGIN statement_list SEND
         ;
 
-read_statement 
-        : READ LPAREN IDENT {factorpush(lookup($3));} RPAREN 
+read_statement
+        : READ LPAREN variable RPAREN 
         {
                 Factor proc, arg1, retval; /* 加算の引数・結果 */
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
@@ -538,7 +545,6 @@ write_statement
                 (tmp->args).call.retval = retval; /* 命令の第 2 引数を指定 */
                 (tmp->args).call.rettype = I32;
                 add_llvmnode(tmp);
-                
         }
         ;
 
@@ -615,10 +621,9 @@ term
                 create_llvmcode(Div);
         }
         ;
-        ;
 
 factor 
-        : var_name
+        : variable
         {
                 create_llvmcode(Load);
         }
@@ -664,12 +669,6 @@ func_call_name
         : IDENT {factorpush(lookup($1));}
         ;
 
-var_name 
-        : IDENT 
-        {
-                factorpush(lookup($1));
-        }
-        ;
 
 arg_list 
         : expression
@@ -677,8 +676,18 @@ arg_list
         ;
 
 id_list
-        : IDENT 
-        {
+        : var_id
+        | id_list COMMA var_id
+        ;
+
+var_id
+        : id_var
+        | id_array
+        ;
+
+id_var
+        : IDENT
+        { 
                 if(arity_decl==1)decltl->arity++;
                 factorpush(insert($1, 0)); 
                 switch(Proc_Term){
@@ -689,13 +698,18 @@ id_list
                                 create_llvmcode(Alloca);
                                 break;
                 }
-
         }
-        | 
-        | id_list COMMA IDENT 
+        ;
+
+id_array
+        : IDENT LBRACKET NUMBER INTERVAL NUMBER RBRACKET
         { 
                 if(arity_decl==1)decltl->arity++;
-                factorpush(insert($3, 0)); 
+                Factor f_tmp;
+                f_tmp = insert($1, 0);
+                f_tmp.range = $5+1;
+                Stack_tl->range = $5+1;
+                factorpush(f_tmp); 
                 switch(Proc_Term){
                         case GLOBAL_VAR:
                                 create_llvmcode(Global);
@@ -705,7 +719,7 @@ id_list
                                 break;
                 }
         }
-        ;
+        ; 
 
 %% 
 
