@@ -493,7 +493,7 @@ typedef struct {
 } YYSTACKDATA;
 /* variables for the parser stack */
 static YYSTACKDATA yystack;
-#line 724 "parser.y"
+#line 726 "parser.y"
  
 
 void yyerror(char *s)
@@ -943,31 +943,31 @@ case 35:
         }
 break;
 case 40:
-#line 308 "parser.y"
+#line 309 "parser.y"
 	{
                 create_llvmcode(Store);
         }
 break;
 case 42:
-#line 316 "parser.y"
+#line 318 "parser.y"
 	{
                 create_llvmcode(GetElem);
         }
 break;
 case 44:
-#line 327 "parser.y"
+#line 329 "parser.y"
 	{
                 factorpush(lookup(yystack.l_mark[0].ident));
         }
 break;
 case 46:
-#line 338 "parser.y"
+#line 340 "parser.y"
 	{
                 create_llvmcode(Sext);
         }
 break;
 case 49:
-#line 351 "parser.y"
+#line 353 "parser.y"
 	{
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode));
                 tmp->command = BrCond;
@@ -980,14 +980,14 @@ case 49:
         }
 break;
 case 50:
-#line 362 "parser.y"
+#line 364 "parser.y"
 	{
                 create_llvmcode(Label);
                 Last_Register ++;
         }
 break;
 case 51:
-#line 367 "parser.y"
+#line 369 "parser.y"
 	{
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode));
                 tmp->command = BrUncond;
@@ -997,11 +997,11 @@ case 51:
         }
 break;
 case 52:
-#line 378 "parser.y"
+#line 380 "parser.y"
 	{ if_flg = 1;}
 break;
 case 53:
-#line 380 "parser.y"
+#line 382 "parser.y"
 	{
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode));
                 tmp->command = BrUncond;
@@ -1014,7 +1014,7 @@ case 53:
         }
 break;
 case 55:
-#line 394 "parser.y"
+#line 396 "parser.y"
 	{
                 create_llvmcode(Label);
                 br_decl->cond = Last_Register;
@@ -1022,21 +1022,21 @@ case 55:
         }
 break;
 case 56:
-#line 399 "parser.y"
+#line 401 "parser.y"
 	{
                 create_llvmcode(BrCond);
                 add_llvmnode(tmp);
         }
 break;
 case 57:
-#line 403 "parser.y"
+#line 405 "parser.y"
 	{
                 create_llvmcode(Label);
                 Last_Register ++;
         }
 break;
 case 58:
-#line 407 "parser.y"
+#line 409 "parser.y"
 	{
                 
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
@@ -1047,19 +1047,19 @@ case 58:
         }
 break;
 case 59:
-#line 419 "parser.y"
+#line 421 "parser.y"
 	{
                 factorpush(lookup(yystack.l_mark[0].ident));
         }
 break;
 case 60:
-#line 423 "parser.y"
+#line 425 "parser.y"
 	{
                 create_llvmcode(Store);
         }
 break;
 case 61:
-#line 427 "parser.y"
+#line 429 "parser.y"
 	{
                 Brdecl *br_tmp;
                 br_tmp = (Brdecl *)malloc(sizeof(Brdecl));
@@ -1073,41 +1073,41 @@ case 61:
         }
 break;
 case 62:
-#line 438 "parser.y"
+#line 440 "parser.y"
 	{
                 create_llvmcode(Label);
                 Last_Register++;
         }
 break;
 case 63:
-#line 442 "parser.y"
+#line 444 "parser.y"
 	{
                 factorpush(lookup(yystack.l_mark[-7].ident));
                 create_llvmcode(Load);
         }
 break;
 case 64:
-#line 447 "parser.y"
+#line 449 "parser.y"
 	{
                 icmptype = SLE;
                 create_llvmcode(Icmp);
         }
 break;
 case 65:
-#line 452 "parser.y"
+#line 454 "parser.y"
 	{
                 create_llvmcode(BrCond);
         }
 break;
 case 66:
-#line 455 "parser.y"
+#line 457 "parser.y"
 	{
                 create_llvmcode(Label);
                 Last_Register ++;
         }
 break;
 case 67:
-#line 460 "parser.y"
+#line 462 "parser.y"
 	{
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode));
                 tmp->command = BrUncond;
@@ -1117,7 +1117,7 @@ case 67:
         }
 break;
 case 68:
-#line 467 "parser.y"
+#line 469 "parser.y"
 	{
                 create_llvmcode(Label);
                 br_decl->inc = Last_Register;
@@ -1125,7 +1125,7 @@ case 68:
         }
 break;
 case 69:
-#line 472 "parser.y"
+#line 474 "parser.y"
 	{
                 factorpush(lookup(yystack.l_mark[-16].ident));
                 factorpush(lookup(yystack.l_mark[-16].ident));
@@ -1133,7 +1133,7 @@ case 69:
         }
 break;
 case 70:
-#line 477 "parser.y"
+#line 479 "parser.y"
 	{
                 
                 Factor arg2; /* 加算の引数・結果 */
@@ -1144,13 +1144,13 @@ case 70:
         }
 break;
 case 71:
-#line 485 "parser.y"
+#line 487 "parser.y"
 	{
                 create_llvmcode(Store);
         }
 break;
 case 72:
-#line 488 "parser.y"
+#line 490 "parser.y"
 	{
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
@@ -1160,11 +1160,11 @@ case 72:
         }
 break;
 case 75:
-#line 503 "parser.y"
+#line 505 "parser.y"
 	{factorpush(lookup(yystack.l_mark[0].ident));}
 break;
 case 77:
-#line 513 "parser.y"
+#line 515 "parser.y"
 	{
                 Factor proc, arg1, retval; /* 加算の引数・結果 */
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
@@ -1183,7 +1183,7 @@ case 77:
         }
 break;
 case 78:
-#line 533 "parser.y"
+#line 535 "parser.y"
 	{
                 Factor proc, arg1, retval; /* 加算の引数・結果 */
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
@@ -1202,49 +1202,49 @@ case 78:
         }
 break;
 case 80:
-#line 557 "parser.y"
+#line 559 "parser.y"
 	{
                 icmptype = EQUAL;
                 create_llvmcode(Icmp);
         }
 break;
 case 81:
-#line 562 "parser.y"
+#line 564 "parser.y"
 	{
                 icmptype = NE;
                 create_llvmcode(Icmp);
         }
 break;
 case 82:
-#line 567 "parser.y"
+#line 569 "parser.y"
 	{
                 icmptype = SLT;
                 create_llvmcode(Icmp);
         }
 break;
 case 83:
-#line 572 "parser.y"
+#line 574 "parser.y"
 	{
                 icmptype = SLE;
                 create_llvmcode(Icmp);
         }
 break;
 case 84:
-#line 577 "parser.y"
+#line 579 "parser.y"
 	{
                 icmptype = SGT;
                 create_llvmcode(Icmp);
         }
 break;
 case 85:
-#line 582 "parser.y"
+#line 584 "parser.y"
 	{
                 icmptype = SGE;
                 create_llvmcode(Icmp);
         }
 break;
 case 88:
-#line 592 "parser.y"
+#line 594 "parser.y"
 	{
                 Factor arg1;
                 arg1.type = CONSTANT;/*第1引数*/
@@ -1253,43 +1253,43 @@ case 88:
         }
 break;
 case 89:
-#line 599 "parser.y"
+#line 601 "parser.y"
 	{
                 create_llvmcode(Sub);
         }
 break;
 case 90:
-#line 603 "parser.y"
+#line 605 "parser.y"
 	{
                 create_llvmcode(Add);
         }
 break;
 case 91:
-#line 607 "parser.y"
+#line 609 "parser.y"
 	{
                 create_llvmcode(Sub);
         }
 break;
 case 93:
-#line 615 "parser.y"
+#line 617 "parser.y"
 	{
                 create_llvmcode(Mul);
         }
 break;
 case 94:
-#line 620 "parser.y"
+#line 622 "parser.y"
 	{
                 create_llvmcode(Div);
         }
 break;
 case 95:
-#line 627 "parser.y"
+#line 629 "parser.y"
 	{
                 create_llvmcode(Load);
         }
 break;
 case 96:
-#line 631 "parser.y"
+#line 633 "parser.y"
 	{
                 Factor tmp;
                 tmp.type=CONSTANT;
@@ -1299,7 +1299,7 @@ case 96:
         }
 break;
 case 98:
-#line 640 "parser.y"
+#line 642 "parser.y"
 	{       
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
@@ -1324,11 +1324,11 @@ case 98:
         }
 break;
 case 100:
-#line 669 "parser.y"
+#line 671 "parser.y"
 	{factorpush(lookup(yystack.l_mark[0].ident));}
 break;
 case 107:
-#line 690 "parser.y"
+#line 692 "parser.y"
 	{ 
                 if(arity_decl==1)decltl->arity++;
                 factorpush(insert(yystack.l_mark[0].ident, 0)); 
@@ -1343,7 +1343,7 @@ case 107:
         }
 break;
 case 108:
-#line 706 "parser.y"
+#line 708 "parser.y"
 	{ 
                 if(arity_decl==1)decltl->arity++;
                 Factor f_tmp;

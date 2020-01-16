@@ -247,7 +247,7 @@ define void @msort2(i32, i32) {
   store i32 %0, i32* %3, align 4
   store i32 %1, i32* %4, align 4
   %6 = load i32, i32* %4, align 4
-  %7 = icmp sge i32 %6, 1
+  %7 = icmp sgt i32 %6, 1
   br i1 %7, label %8, label %21
 
 8:

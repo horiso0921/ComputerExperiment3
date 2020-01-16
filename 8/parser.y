@@ -304,10 +304,12 @@ statement
         ;
 
 assignment_statement
-        : variable ASSIGN expression 
+        : variable
+        ASSIGN expression 
         {
                 create_llvmcode(Store);
         }
+        // | IDENT LBRACKET expression RBRACKET ASSIGN expression
         ;
 
 variable

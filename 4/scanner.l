@@ -10,6 +10,7 @@
 
 #include "y.tab.h"
 extern void yyparse();
+extern int fileno();
 
 /*
  * yylval という変数名にするのは，yacc との融合時にプログラムの変更を
@@ -44,8 +45,8 @@ write           return WRITE;
 "<>"            return NEQ;
 "<"             return LT;
 "<="            return LE;
-">"             return GE;
-">="            return GT;
+">"             return GT;
+">="            return GE;
 "("             return LPAREN;
 ")"             return RPAREN;
 "["             return LBRACKET;
@@ -94,11 +95,6 @@ void main(int argc, char *argv[]) {
      */
     yyin = fp;
 
-    /*
-     * yylex() を呼び出すことにより，トークンが一つ切り出される．
-     * yylex() の戻り値は，上のアクション部で定義した戻り値である．
-     * yytext には，切り出されたトークンが文字列として格納されている．
-     */
     yyparse();
     return;
 }

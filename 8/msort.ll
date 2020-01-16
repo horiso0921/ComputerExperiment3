@@ -5,8 +5,8 @@ target triple = "x86_64-unknown-linux-gnu"
 
 @.str = private unnamed_addr constant [3 x i8] c"%d\00", align 1
 @a = common dso_local global [101 x i32] zeroinitializer, align 16
-@.str.1 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
 @b = common dso_local global [101 x i32] zeroinitializer, align 16
+@.str.1 = private unnamed_addr constant [4 x i8] c"%d\0A\00", align 1
 @n = common dso_local global i32 0, align 4
 
 ; Function Attrs: noinline nounwind optnone uwtable
@@ -17,11 +17,11 @@ define dso_local void @init(i32) #0 {
   store i32 1, i32* %3, align 4
   br label %4
 
-4:                                                ; preds = %17, %1
+4:                                                ; preds = %20, %1
   %5 = load i32, i32* %3, align 4
   %6 = load i32, i32* %2, align 4
   %7 = icmp sle i32 %5, %6
-  br i1 %7, label %8, label %20
+  br i1 %7, label %8, label %23
 
 8:                                                ; preds = %4
   %9 = load i32, i32* %3, align 4
@@ -32,16 +32,19 @@ define dso_local void @init(i32) #0 {
   %14 = sext i32 %13 to i64
   %15 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %14
   %16 = load i32, i32* %15, align 4
-  store i32 %16, i32* %2, align 4
-  br label %17
+  %17 = load i32, i32* %3, align 4
+  %18 = sext i32 %17 to i64
+  %19 = getelementptr inbounds [101 x i32], [101 x i32]* @b, i64 0, i64 %18
+  store i32 %16, i32* %19, align 4
+  br label %20
 
-17:                                               ; preds = %8
-  %18 = load i32, i32* %3, align 4
-  %19 = add nsw i32 %18, 1
-  store i32 %19, i32* %3, align 4
+20:                                               ; preds = %8
+  %21 = load i32, i32* %3, align 4
+  %22 = add nsw i32 %21, 1
+  store i32 %22, i32* %3, align 4
   br label %4
 
-20:                                               ; preds = %4
+23:                                               ; preds = %4
   ret void
 }
 

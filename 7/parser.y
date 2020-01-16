@@ -304,10 +304,6 @@ assignment_statement
         {
                 Factor tmp;
                 tmp = lookup($1);
-                if (tmp.type == PROC_NAME) {
-                        tmp.cal = decltl->arity+1;
-                        tmp.type = LOCAL_VAR;
-                }
                 factorpush(tmp);
         }
         ASSIGN expression 

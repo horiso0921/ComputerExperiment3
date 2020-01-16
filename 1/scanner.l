@@ -6,21 +6,17 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "symbols.h"
-
 #define MAXLENGTH 16
 
-typedef union {
-    int num;
-    char ident[MAXLENGTH+1];
-} token;
+#include "y.tab.h"
+extern void yyparse();
+extern int fileno();
 
 /*
  * yylval という変数名にするのは，yacc との融合時にプログラムの変更を
  * 最小限にするためである．
  */
-token yylval; 
- 
+
 %}
 %option yylineno
 %%
@@ -49,8 +45,8 @@ write           return WRITE;
 "<>"            return NEQ;
 "<"             return LT;
 "<="            return LE;
-">"             return GE;
-">="            return GT;
+">"             return GT;
+">="            return GE;
 "("             return LPAREN;
 ")"             return RPAREN;
 "["             return LBRACKET;
@@ -80,7 +76,7 @@ write           return WRITE;
 
 %%
 
-main(int argc, char *argv[]) {
+void main(int argc, char *argv[]) {
     FILE *fp;
     int tok;
     
@@ -99,25 +95,7 @@ main(int argc, char *argv[]) {
      */
     yyin = fp;
 
-    /*
-     * yylex() を呼び出すことにより，トークンが一つ切り出される．
-     * yylex() の戻り値は，上のアクション部で定義した戻り値である．
-     * yytext には，切り出されたトークンが文字列として格納されている．
-     */
-    while (tok = yylex()) {
-        switch (tok) {
-        case NUMBER:
-            printf("\"%s\":\t%d\t%d\n", yytext, tok, yylval.num);
-            break;
-
-        case IDENT:
-            printf("\"%s\":\t%d\t%s\n", yytext, tok, yylval.ident);
-            break;
-
-        default:
-            printf("\"%s\":\t%d\tRESERVE\n", yytext, tok);
-            break;
-        }
-    }
+    yyparse();
+    return;
 }
 
