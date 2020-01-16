@@ -105,7 +105,8 @@ subprog_decl_part
                 Factor ftmp;
                 ftmp.type = LOCAL_VAR;
                 ftmp.cal = Last_Register;
-                ftmp.range = 0;
+                ftmp.off = 0;
+                ftmp.fin = 0;
                 factorpush(ftmp);
                 Last_Register++;
                 create_llvmcode(Alloca);
@@ -128,7 +129,8 @@ subprog_decl_part
                 Factor ftmp;
                 ftmp.type = LOCAL_VAR;
                 ftmp.cal = Last_Register;
-                ftmp.range = 0;
+                ftmp.off = 0;
+                ftmp.fin = 0;
                 factorpush(ftmp);
                 Last_Register++;
                 create_llvmcode(Alloca);
@@ -162,7 +164,8 @@ subprog_decl
                 tmp = lookup(decltl->fname);
                 arg1.type = LOCAL_VAR;
                 arg1.cal = tmp.ret;
-                arg1.range = 0;
+                arg1.off = 0;
+                arg1.fin = 0;
                 factorpush(arg1);
                 create_llvmcode(Load);
                 create_llvmcode(Ret);                
@@ -218,7 +221,8 @@ func_name
                 Factor f_tmp;
                 f_tmp.type = LOCAL_VAR;
                 f_tmp.cal = Last_Register++;
-                f_tmp.range = 0;
+                f_tmp.fin = 0;
+                f_tmp.off = 0;
                 factorpush(f_tmp);
                 create_llvmcode(Alloca);
         }
@@ -709,8 +713,10 @@ id_array
                 if(arity_decl==1)decltl->arity++;
                 Factor f_tmp;
                 f_tmp = insert($1, 0);
-                f_tmp.range = $5+1;
-                Stack_tl->range = $5+1;
+                f_tmp.off = $3;
+                f_tmp.fin = $5;
+                Stack_tl->fin = $5;
+                Stack_tl->off = $3;
                 factorpush(f_tmp); 
                 switch(Proc_Term){
                         case GLOBAL_VAR:

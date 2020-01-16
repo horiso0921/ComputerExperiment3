@@ -1,5 +1,5 @@
 extern FILE *fp;
-int i;
+int i,j;
 
 void displayFactor(Factor factor) {
         switch( factor.type ){
@@ -51,8 +51,8 @@ void displayLlvmcodes( LLVMcode *code){
                 case Alloca:
                         displayFactor( (code->args).alloca.retval);
                         fprintf(fp," = alloca");
-                        if ((code->args).alloca.retval.range != 0){
-                                fprintf(fp," [%d x i32] zeroinitializer, align 16\n",(code->args).alloca.retval.range);
+                        if ((code->args).alloca.retval.fin != 0){
+                                fprintf(fp," [%d x i32] zeroinitializer, align 16\n",(code->args).alloca.retval.fin - (code->args).alloca.retval.off + 1);
                         } else {
                                 fprintf(fp," i32, align 4\n");
                         }
@@ -60,8 +60,8 @@ void displayLlvmcodes( LLVMcode *code){
                 case Global:
                         displayFactor( (code->args).global.retval);
                         fprintf(fp," = common global");
-                        if ((code->args).alloca.retval.range != 0){
-                                fprintf(fp," [%d x i32] zeroinitializer, align 16\n",(code->args).alloca.retval.range);
+                        if ((code->args).alloca.retval.fin != 0){
+                                fprintf(fp," [%d x i32] zeroinitializer, align 16\n",(code->args).alloca.retval.fin - (code->args).alloca.retval.off + 1);
                         } else {
                                 fprintf(fp," i32 0, align 4\n");
                         }
@@ -183,7 +183,8 @@ void displayLlvmcodes( LLVMcode *code){
                         break;
                 case GetElem:
                         displayFactor((code->args).getelem.retval);
-                        fprintf(fp," = getelementptr inbounds [%d x i32], [%d x i32]* ", (code->args).getelem.arg1.range,(code->args).getelem.arg1.range);
+                        j = (code->args).getelem.arg1.fin-(code->args).getelem.arg1.off+1;
+                        fprintf(fp," = getelementptr inbounds [%d x i32], [%d x i32]* ", j,j);
                         displayFactor((code->args).getelem.arg1);
                         fprintf(fp,", i64 0, i64 ");
                         displayFactor((code->args).getelem.arg2);

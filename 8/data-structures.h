@@ -42,7 +42,8 @@ typedef struct factor{
   char val[MAXLENGTH+1]; /* 変数や手続きの場合の名前 */ 
   int cal; /* 変数の場合割り当てたレジスタ番号 */
   int ret; /* 関数の場合返り値に割り当てたレジスタ番号 */
-  int range; /* 配列の場合その配列の確保したindexの最大値を保持する*/
+  int fin; /* 配列の場合その配列の確保したindexの最大値を保持する*/
+  int off; /* 配列の場合その配列の確保したindexの最小値を保持する*/
   struct factor *before;
   struct factor *next;
 } Factor;

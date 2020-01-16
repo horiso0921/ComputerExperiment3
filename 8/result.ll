@@ -3,8 +3,8 @@
 declare i32 @__isoc99_scanf(i8*, ...)
 declare i32 @printf(i8*, ...)
 @n = common global i32 0, align 4
-@a = common global [101 x i32] zeroinitializer, align 16
-@b = common global [101 x i32] zeroinitializer, align 16
+@a = common global [100 x i32] zeroinitializer, align 16
+@b = common global [100 x i32] zeroinitializer, align 16
 
 define void @init1(i32) {
   %2 = alloca i32, align 4
@@ -22,14 +22,14 @@ define void @init1(i32) {
 8:
   %9 = load i32, i32* %3, align 4
   %10 = sext i32 %9 to i64
-  %11 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %10
+  %11 = getelementptr inbounds [100 x i32], [100 x i32]* @a, i64 0, i64 %10
   %12 = call i32 (i8*, ...) @__isoc99_scanf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str, i64 0, i64 0), i32* %11)
   %13 = load i32, i32* %3, align 4
   %14 = sext i32 %13 to i64
-  %15 = getelementptr inbounds [101 x i32], [101 x i32]* @b, i64 0, i64 %14
+  %15 = getelementptr inbounds [100 x i32], [100 x i32]* @b, i64 0, i64 %14
   %16 = load i32, i32* %3, align 4
   %17 = sext i32 %16 to i64
-  %18 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %17
+  %18 = getelementptr inbounds [100 x i32], [100 x i32]* @a, i64 0, i64 %17
   %19 = load i32, i32* %18, align 4
   store i32 %19, i32* %15, align 4
   br label %20
@@ -60,7 +60,7 @@ define void @output1(i32) {
 8:
   %9 = load i32, i32* %3, align 4
   %10 = sext i32 %9 to i64
-  %11 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %10
+  %11 = getelementptr inbounds [100 x i32], [100 x i32]* @a, i64 0, i64 %10
   %12 = load i32, i32* %11, align 4
   %13 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.str.1, i64 0, i64 0), i32 %12)
   br label %14
@@ -117,10 +117,10 @@ define void @merge2(i32, i32) {
 29:
   %30 = load i32, i32* %7, align 4
   %31 = sext i32 %30 to i64
-  %32 = getelementptr inbounds [101 x i32], [101 x i32]* @b, i64 0, i64 %31
+  %32 = getelementptr inbounds [100 x i32], [100 x i32]* @b, i64 0, i64 %31
   %33 = load i32, i32* %5, align 4
   %34 = sext i32 %33 to i64
-  %35 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %34
+  %35 = getelementptr inbounds [100 x i32], [100 x i32]* @a, i64 0, i64 %34
   %36 = load i32, i32* %35, align 4
   store i32 %36, i32* %32, align 4
   %37 = load i32, i32* %5, align 4
@@ -139,11 +139,11 @@ define void @merge2(i32, i32) {
 45:
   %46 = load i32, i32* %5, align 4
   %47 = sext i32 %46 to i64
-  %48 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %47
+  %48 = getelementptr inbounds [100 x i32], [100 x i32]* @a, i64 0, i64 %47
   %49 = load i32, i32* %48, align 4
   %50 = load i32, i32* %6, align 4
   %51 = sext i32 %50 to i64
-  %52 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %51
+  %52 = getelementptr inbounds [100 x i32], [100 x i32]* @a, i64 0, i64 %51
   %53 = load i32, i32* %52, align 4
   %54 = icmp sle i32 %49, %53
   br i1 %54, label %55, label %65
@@ -151,10 +151,10 @@ define void @merge2(i32, i32) {
 55:
   %56 = load i32, i32* %7, align 4
   %57 = sext i32 %56 to i64
-  %58 = getelementptr inbounds [101 x i32], [101 x i32]* @b, i64 0, i64 %57
+  %58 = getelementptr inbounds [100 x i32], [100 x i32]* @b, i64 0, i64 %57
   %59 = load i32, i32* %5, align 4
   %60 = sext i32 %59 to i64
-  %61 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %60
+  %61 = getelementptr inbounds [100 x i32], [100 x i32]* @a, i64 0, i64 %60
   %62 = load i32, i32* %61, align 4
   store i32 %62, i32* %58, align 4
   %63 = load i32, i32* %5, align 4
@@ -165,10 +165,10 @@ define void @merge2(i32, i32) {
 65:
   %66 = load i32, i32* %7, align 4
   %67 = sext i32 %66 to i64
-  %68 = getelementptr inbounds [101 x i32], [101 x i32]* @b, i64 0, i64 %67
+  %68 = getelementptr inbounds [100 x i32], [100 x i32]* @b, i64 0, i64 %67
   %69 = load i32, i32* %6, align 4
   %70 = sext i32 %69 to i64
-  %71 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %70
+  %71 = getelementptr inbounds [100 x i32], [100 x i32]* @a, i64 0, i64 %70
   %72 = load i32, i32* %71, align 4
   store i32 %72, i32* %68, align 4
   %73 = load i32, i32* %6, align 4
@@ -182,10 +182,10 @@ define void @merge2(i32, i32) {
 76:
   %77 = load i32, i32* %7, align 4
   %78 = sext i32 %77 to i64
-  %79 = getelementptr inbounds [101 x i32], [101 x i32]* @b, i64 0, i64 %78
+  %79 = getelementptr inbounds [100 x i32], [100 x i32]* @b, i64 0, i64 %78
   %80 = load i32, i32* %6, align 4
   %81 = sext i32 %80 to i64
-  %82 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %81
+  %82 = getelementptr inbounds [100 x i32], [100 x i32]* @a, i64 0, i64 %81
   %83 = load i32, i32* %82, align 4
   store i32 %83, i32* %79, align 4
   %84 = load i32, i32* %6, align 4
@@ -222,10 +222,10 @@ define void @merge2(i32, i32) {
 100:
   %101 = load i32, i32* %7, align 4
   %102 = sext i32 %101 to i64
-  %103 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %102
+  %103 = getelementptr inbounds [100 x i32], [100 x i32]* @a, i64 0, i64 %102
   %104 = load i32, i32* %7, align 4
   %105 = sext i32 %104 to i64
-  %106 = getelementptr inbounds [101 x i32], [101 x i32]* @b, i64 0, i64 %105
+  %106 = getelementptr inbounds [100 x i32], [100 x i32]* @b, i64 0, i64 %105
   %107 = load i32, i32* %106, align 4
   store i32 %107, i32* %103, align 4
   br label %108

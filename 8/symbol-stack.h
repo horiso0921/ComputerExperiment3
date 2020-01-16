@@ -27,7 +27,8 @@ Factor insert(char *name, int flag) {
         tmp->type = flag + Proc_Term;
         tmp->before = Stack_tl;
         tmp->next = NULL;
-        tmp->range = 0;
+        tmp->off = 0;
+        tmp->fin = 0;
         strcpy(tmp->val, name);
         if (tmp->type == LOCAL_VAR) {
                 tmp->cal = Last_Register;
@@ -47,7 +48,8 @@ Factor insert(char *name, int flag) {
         Factor res;
         res.type = tmp->type;
         res.cal = tmp->cal;
-        res.range = 0;
+        res.fin = 0;
+        res.off = 0;
         strcpy(res.val, name);
         return res;
 }
@@ -72,7 +74,8 @@ Factor lookup(char *name){
         Factor res;
         res.type = fact->type;
         res.cal = fact->cal;
-        res.range = fact->range;
+        res.off = fact->off;
+        res.fin = fact->fin;
         res.ret = fact->ret;
         strcpy(res.val, name);
         return res;
