@@ -105,7 +105,6 @@ subprog_decl_part
                 Factor ftmp;
                 ftmp.type = LOCAL_VAR;
                 ftmp.cal = Last_Register;
-                ftmp.range = 0;
                 factorpush(ftmp);
                 Last_Register++;
                 create_llvmcode(Alloca);
@@ -128,7 +127,6 @@ subprog_decl_part
                 Factor ftmp;
                 ftmp.type = LOCAL_VAR;
                 ftmp.cal = Last_Register;
-                ftmp.range = 0;
                 factorpush(ftmp);
                 Last_Register++;
                 create_llvmcode(Alloca);
@@ -162,7 +160,6 @@ subprog_decl
                 tmp = lookup(decltl->fname);
                 arg1.type = LOCAL_VAR;
                 arg1.cal = tmp.ret;
-                arg1.range = 0;
                 factorpush(arg1);
                 create_llvmcode(Load);
                 create_llvmcode(Ret);                
@@ -218,7 +215,6 @@ func_name
                 Factor f_tmp;
                 f_tmp.type = LOCAL_VAR;
                 f_tmp.cal = Last_Register++;
-                f_tmp.range = 0;
                 factorpush(f_tmp);
                 create_llvmcode(Alloca);
         }
@@ -304,56 +300,22 @@ statement
         ;
 
 assignment_statement
-        : variable 
+        : IDENT 
         {
                 Factor tmp;
-                tmp = factorpop();
-                factorpush(tmp);
-                if (tmp.range != 0){
-                        create_llvmcode(Load);
+                tmp = lookup($1);
+                if (tmp.type == PROC_NAME) {
+                        tmp.cal = decltl->arity+1;
+                        tmp.type = LOCAL_VAR;
                 }
+                
+                factorpush(tmp);
         }
         ASSIGN expression 
         {
                 create_llvmcode(Store);
         }
         ;
-
-variable
-        : entire_variable
-        | component_variable
-        {
-                create_llvmcode(GetElem);
-        }
-        ;
-
-entire_variable
-        : variable_id
-        ;
-
-variable_id
-        : IDENT
-        {
-                factorpush(lookup($1));
-        }
-        ;
-
-component_variable
-        : indexed_variable
-        ;
-
-indexed_variable
-        : array_variable LBRACKET expression 
-        {
-                create_llvmcode(Sext);
-        }
-        RBRACKET
-        ;
-
-array_variable 
-        : variable
-
-
 
 if_statement 
         : IF condition 
@@ -517,8 +479,8 @@ block_statement
         : SBEGIN statement_list SEND
         ;
 
-read_statement
-        : READ LPAREN variable RPAREN 
+read_statement 
+        : READ LPAREN IDENT {factorpush(lookup($3));} RPAREN 
         {
                 Factor proc, arg1, retval; /* 加算の引数・結果 */
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
@@ -554,6 +516,7 @@ write_statement
                 (tmp->args).call.retval = retval; /* 命令の第 2 引数を指定 */
                 (tmp->args).call.rettype = I32;
                 add_llvmnode(tmp);
+                
         }
         ;
 
@@ -630,9 +593,10 @@ term
                 create_llvmcode(Div);
         }
         ;
+        ;
 
 factor 
-        : variable
+        : var_name
         {
                 create_llvmcode(Load);
         }
@@ -678,6 +642,12 @@ func_call_name
         : IDENT {factorpush(lookup($1));}
         ;
 
+var_name 
+        : IDENT 
+        {
+                factorpush(lookup($1));
+        }
+        ;
 
 arg_list 
         : expression
@@ -685,19 +655,9 @@ arg_list
         ;
 
 id_list
-        : var_id
-        | id_list COMMA var_id
-        ;
-
-var_id
-        : id_var
-        | id_array
-        ;
-
-id_var
-        : IDENT
-        { 
-                if(arity_decl==1)decltl->arity++;
+        : IDENT 
+        {
+                if(arity_decl==1)decltl->arity ++;
                 factorpush(insert($1, 0)); 
                 switch(Proc_Term){
                         case GLOBAL_VAR:
@@ -707,18 +667,13 @@ id_var
                                 create_llvmcode(Alloca);
                                 break;
                 }
-        }
-        ;
 
-id_array
-        : IDENT LBRACKET NUMBER INTERVAL NUMBER RBRACKET
+        }
+
+        | id_list COMMA IDENT 
         { 
-                if(arity_decl==1)decltl->arity++;
-                Factor f_tmp;
-                f_tmp = insert($1, 0);
-                f_tmp.range = $5+1;
-                Stack_tl->range = $5+1;
-                factorpush(f_tmp); 
+                if(arity_decl==1)decltl->arity ++;
+                factorpush(insert($3, 0)); 
                 switch(Proc_Term){
                         case GLOBAL_VAR:
                                 create_llvmcode(Global);
@@ -728,7 +683,7 @@ id_array
                                 break;
                 }
         }
-        ; 
+        ;
 
 %% 
 
@@ -736,3 +691,4 @@ void yyerror(char *s)
 {
   fprintf(stderr, "%s \nline=%d token=%s\n", s, yylineno, yytext);
 }
+-^

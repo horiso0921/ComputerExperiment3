@@ -304,16 +304,7 @@ statement
         ;
 
 assignment_statement
-        : variable 
-        {
-                Factor tmp;
-                tmp = factorpop();
-                factorpush(tmp);
-                if (tmp.range != 0){
-                        create_llvmcode(Load);
-                }
-        }
-        ASSIGN expression 
+        : variable ASSIGN expression 
         {
                 create_llvmcode(Store);
         }

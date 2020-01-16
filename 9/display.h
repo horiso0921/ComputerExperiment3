@@ -50,11 +50,22 @@ void displayLlvmcodes( LLVMcode *code){
         switch( code->command ){
                 case Alloca:
                         displayFactor( (code->args).alloca.retval);
-                        fprintf(fp," = alloca i32, align 4\n");
+                        fprintf(fp," = alloca");
+                        if ((code->args).alloca.retval.range != 0){
+                                fprintf(fp," [%d x i32] zeroinitializer, align 16\n",(code->args).alloca.retval.range);
+                        } else {
+                                fprintf(fp," i32, align 4\n");
+                        }
                         break;
                 case Global:
                         displayFactor( (code->args).global.retval);
-                        fprintf(fp," = common global i32 0, align 4\n");
+                        fprintf(fp," = common global");
+                        if ((code->args).alloca.retval.range != 0){
+                                fprintf(fp," [%d x i32] zeroinitializer, align 16\n",(code->args).alloca.retval.range);
+                        } else {
+                                fprintf(fp," i32 0, align 4\n");
+                        }
+                        break;
                         break;
                 case Store:
                         fprintf(fp,"store i32 ");
@@ -162,6 +173,20 @@ void displayLlvmcodes( LLVMcode *code){
                         displayFactor((code->args).icmp.arg1);
                         fprintf(fp,", ");
                         displayFactor((code->args).icmp.arg2);
+                        fprintf(fp,"\n");
+                        break;
+                case Sext:
+                        displayFactor((code->args).sext.retval);
+                        fprintf(fp," = sext i32 ");
+                        displayFactor((code->args).sext.arg1);
+                        fprintf(fp," to i64\n");
+                        break;
+                case GetElem:
+                        displayFactor((code->args).getelem.retval);
+                        fprintf(fp," = getelementptr inbounds [%d x i32], [%d x i32]* ", (code->args).getelem.arg1.range,(code->args).getelem.arg1.range);
+                        displayFactor((code->args).getelem.arg1);
+                        fprintf(fp,", i64 0, i64 ");
+                        displayFactor((code->args).getelem.arg2);
                         fprintf(fp,"\n");
                         break;
                 default:

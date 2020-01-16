@@ -288,6 +288,7 @@ statement
                         }
                         (tmp->args).call.args[i] = arg;
                 }
+                (tmp->args).call.arity = i;
                 (tmp->args).call.proc = arg;
                 (tmp->args).call.rettype = vo;
                 add_llvmnode(tmp);
@@ -307,7 +308,6 @@ assignment_statement
                         tmp.cal = decltl->arity+1;
                         tmp.type = LOCAL_VAR;
                 }
-                
                 factorpush(tmp);
         }
         ASSIGN expression 
@@ -616,12 +616,12 @@ factor
                 Factor arg;
                 for (i = 0; i < 11;i++){
                         arg = factorpop();
-                        printf("%d",arg.type);
                         if(arg.type == PROC_NAME){
                                 break;
                         }
                         (tmp->args).call.args[i] = arg;
                 }
+                (tmp->args).call.arity = i;
                 (tmp->args).call.proc = arg;
                 (tmp->args).call.rettype = I32;
                 Factor retval;

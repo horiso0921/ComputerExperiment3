@@ -19,6 +19,8 @@ void Calcode();
 void Icmpcode();
 void Callcode();
 void Retcode();
+void Sextcode();
+void GetElemcode();
 int i;
 LLVMcode *Tmp;
 Factor *Stack_tmp;
@@ -66,6 +68,12 @@ void create_llvmcode(LLVMcommand command){
             break;
         case Ret:       /* ret   */
             Retcode();
+            break;
+        case Sext:
+            Sextcode();
+            break;
+        case GetElem:
+            GetElemcode();
             break;
         default:
             break;
@@ -177,4 +185,28 @@ void Callcode(){
 }
 void Retcode(){
     (tmp->args).ret.arg1 = factorpop();
+}
+
+void Sextcode(){
+    Factor arg1, retval; /* 型変換の引数・結果 */
+    retval.type = LOCAL_VAR;
+    retval.cal = Last_Register;
+    Last_Register++;
+    arg1 = factorpop();/*スタックから第1引数をポップ*/
+    (tmp->args).sext.arg1 = arg1; /* 命令の第 1 引数を指定 */
+    (tmp->args).sext.retval = retval; /* 命令の第 1 引数を指定 */
+    factorpush(retval);
+}
+
+void GetElemcode(){
+    Factor arg1, arg2, retval; /* 型変換の引数・結果 */
+    retval.type = LOCAL_VAR;
+    retval.cal = Last_Register;
+    Last_Register++;
+    arg2 = factorpop();
+    arg1 = factorpop();/*スタックから第1引数をポップ*/
+    (tmp->args).getelem.arg1 = arg1; /* 命令の第 1 引数を指定 */
+    (tmp->args).getelem.arg2 = arg2; /* 命令の第 2 引数を指定 */
+    (tmp->args).getelem.retval = retval; /* 結果のレジスタを指定 */
+    factorpush(retval);
 }

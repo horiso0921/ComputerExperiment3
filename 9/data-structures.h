@@ -22,7 +22,9 @@ typedef enum {
   Div,      /* div    */
   Icmp,     /* icmp   */
   Call,      /* call   */
-  Ret       /* ret    */
+  Ret,       /* ret    */
+  Sext,      /* sext   */
+  GetElem      /* getelem  */
 } LLVMcommand;
 
 /* 比較演算子の種類 */
@@ -40,6 +42,7 @@ typedef struct factor{
   char val[MAXLENGTH+1]; /* 変数や手続きの場合の名前 */ 
   int cal; /* 変数の場合割り当てたレジスタ番号 */
   int ret; /* 関数の場合返り値に割り当てたレジスタ番号 */
+  int range; /* 配列の場合その配列の確保したindexの最大値を保持する*/
   struct factor *before;
   struct factor *next;
 } Factor;
@@ -104,6 +107,12 @@ typedef struct llvmcode {
     struct { /* ret    */
       Factor arg1;
     } ret;
+    struct { /* sext    */
+      Factor arg1; Factor retval;
+    } sext;
+    struct { /* getelem    */
+      Factor arg1; Factor arg2; Factor retval;
+    } getelem;
   } args;
   /* 次の命令へのポインタ */
   struct llvmcode *next;
