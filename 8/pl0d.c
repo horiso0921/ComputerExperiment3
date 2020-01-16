@@ -6,7 +6,7 @@ void fact(){
         tmp = 1;
     }else{
         m = n;
-        n = n - 1;
+        n = n--;
         fact();
         tmp = tmp*m;
     }

@@ -17,7 +17,7 @@ define void @init1(i32) {
   %5 = load i32, i32* %3, align 4
   %6 = load i32, i32* %2, align 4
   %7 = icmp sle i32 %5, %6
-  br i1 %7, label %8, label %24
+  br i1 %7, label %8, label %23
 
 8:
   %9 = load i32, i32* %3, align 4
@@ -27,21 +27,20 @@ define void @init1(i32) {
   %13 = load i32, i32* %3, align 4
   %14 = sext i32 %13 to i64
   %15 = getelementptr inbounds [101 x i32], [101 x i32]* @b, i64 0, i64 %14
-  %16 = load i32, i32* %15, align 4
-  %17 = load i32, i32* %3, align 4
-  %18 = sext i32 %17 to i64
-  %19 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %18
-  %20 = load i32, i32* %19, align 4
-  store i32 %20, i32* %16, align 4
-  br label %21
+  %16 = load i32, i32* %3, align 4
+  %17 = sext i32 %16 to i64
+  %18 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %17
+  %19 = load i32, i32* %18, align 4
+  store i32 %19, i32* %15, align 4
+  br label %20
 
-21:
-  %22 = load i32, i32* %3, align 4
-  %23 = add nsw i32 %22, 1
-  store i32 %23, i32* %3, align 4
+20:
+  %21 = load i32, i32* %3, align 4
+  %22 = add nsw i32 %21, 1
+  store i32 %22, i32* %3, align 4
   br label %4
 
-24:
+23:
   ret void
 }
 
@@ -105,7 +104,7 @@ define void @merge2(i32, i32) {
   %20 = add nsw i32 %18, %19
   %21 = sub nsw i32 %20, 1
   %22 = icmp sle i32 %17, %21
-  br i1 %22, label %23, label %95
+  br i1 %22, label %23, label %91
 
 23:
   %24 = load i32, i32* %6, align 4
@@ -113,136 +112,131 @@ define void @merge2(i32, i32) {
   %26 = load i32, i32* %4, align 4
   %27 = add nsw i32 %25, %26
   %28 = icmp eq i32 %24, %27
-  br i1 %28, label %29, label %40
+  br i1 %28, label %29, label %39
 
 29:
   %30 = load i32, i32* %7, align 4
   %31 = sext i32 %30 to i64
   %32 = getelementptr inbounds [101 x i32], [101 x i32]* @b, i64 0, i64 %31
-  %33 = load i32, i32* %32, align 4
-  %34 = load i32, i32* %5, align 4
-  %35 = sext i32 %34 to i64
-  %36 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %35
-  %37 = load i32, i32* %36, align 4
-  store i32 %37, i32* %33, align 4
-  %38 = load i32, i32* %5, align 4
-  %39 = add nsw i32 %38, 1
-  store i32 %39, i32* %5, align 4
-  br label %91
+  %33 = load i32, i32* %5, align 4
+  %34 = sext i32 %33 to i64
+  %35 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %34
+  %36 = load i32, i32* %35, align 4
+  store i32 %36, i32* %32, align 4
+  %37 = load i32, i32* %5, align 4
+  %38 = add nsw i32 %37, 1
+  store i32 %38, i32* %5, align 4
+  br label %87
 
-40:
-  %41 = load i32, i32* %5, align 4
-  %42 = load i32, i32* %3, align 4
-  %43 = load i32, i32* %8, align 4
-  %44 = add nsw i32 %42, %43
-  %45 = icmp slt i32 %41, %44
-  br i1 %45, label %46, label %79
+39:
+  %40 = load i32, i32* %5, align 4
+  %41 = load i32, i32* %3, align 4
+  %42 = load i32, i32* %8, align 4
+  %43 = add nsw i32 %41, %42
+  %44 = icmp slt i32 %40, %43
+  br i1 %44, label %45, label %76
 
-46:
-  %47 = load i32, i32* %5, align 4
-  %48 = sext i32 %47 to i64
-  %49 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %48
-  %50 = load i32, i32* %49, align 4
-  %51 = load i32, i32* %6, align 4
-  %52 = sext i32 %51 to i64
-  %53 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %52
-  %54 = load i32, i32* %53, align 4
-  %55 = icmp sle i32 %50, %54
-  br i1 %55, label %56, label %67
+45:
+  %46 = load i32, i32* %5, align 4
+  %47 = sext i32 %46 to i64
+  %48 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %47
+  %49 = load i32, i32* %48, align 4
+  %50 = load i32, i32* %6, align 4
+  %51 = sext i32 %50 to i64
+  %52 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %51
+  %53 = load i32, i32* %52, align 4
+  %54 = icmp sle i32 %49, %53
+  br i1 %54, label %55, label %65
 
-56:
-  %57 = load i32, i32* %7, align 4
-  %58 = sext i32 %57 to i64
-  %59 = getelementptr inbounds [101 x i32], [101 x i32]* @b, i64 0, i64 %58
-  %60 = load i32, i32* %59, align 4
-  %61 = load i32, i32* %5, align 4
-  %62 = sext i32 %61 to i64
-  %63 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %62
-  %64 = load i32, i32* %63, align 4
-  store i32 %64, i32* %60, align 4
-  %65 = load i32, i32* %5, align 4
-  %66 = add nsw i32 %65, 1
-  store i32 %66, i32* %5, align 4
-  br label %78
+55:
+  %56 = load i32, i32* %7, align 4
+  %57 = sext i32 %56 to i64
+  %58 = getelementptr inbounds [101 x i32], [101 x i32]* @b, i64 0, i64 %57
+  %59 = load i32, i32* %5, align 4
+  %60 = sext i32 %59 to i64
+  %61 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %60
+  %62 = load i32, i32* %61, align 4
+  store i32 %62, i32* %58, align 4
+  %63 = load i32, i32* %5, align 4
+  %64 = add nsw i32 %63, 1
+  store i32 %64, i32* %5, align 4
+  br label %75
 
-67:
-  %68 = load i32, i32* %7, align 4
-  %69 = sext i32 %68 to i64
-  %70 = getelementptr inbounds [101 x i32], [101 x i32]* @b, i64 0, i64 %69
-  %71 = load i32, i32* %70, align 4
-  %72 = load i32, i32* %6, align 4
-  %73 = sext i32 %72 to i64
-  %74 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %73
-  %75 = load i32, i32* %74, align 4
-  store i32 %75, i32* %71, align 4
-  %76 = load i32, i32* %6, align 4
-  %77 = add nsw i32 %76, 1
-  store i32 %77, i32* %6, align 4
-  br label %78
+65:
+  %66 = load i32, i32* %7, align 4
+  %67 = sext i32 %66 to i64
+  %68 = getelementptr inbounds [101 x i32], [101 x i32]* @b, i64 0, i64 %67
+  %69 = load i32, i32* %6, align 4
+  %70 = sext i32 %69 to i64
+  %71 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %70
+  %72 = load i32, i32* %71, align 4
+  store i32 %72, i32* %68, align 4
+  %73 = load i32, i32* %6, align 4
+  %74 = add nsw i32 %73, 1
+  store i32 %74, i32* %6, align 4
+  br label %75
 
-78:
-  br label %90
+75:
+  br label %86
 
-79:
-  %80 = load i32, i32* %7, align 4
+76:
+  %77 = load i32, i32* %7, align 4
+  %78 = sext i32 %77 to i64
+  %79 = getelementptr inbounds [101 x i32], [101 x i32]* @b, i64 0, i64 %78
+  %80 = load i32, i32* %6, align 4
   %81 = sext i32 %80 to i64
-  %82 = getelementptr inbounds [101 x i32], [101 x i32]* @b, i64 0, i64 %81
+  %82 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %81
   %83 = load i32, i32* %82, align 4
+  store i32 %83, i32* %79, align 4
   %84 = load i32, i32* %6, align 4
-  %85 = sext i32 %84 to i64
-  %86 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %85
-  %87 = load i32, i32* %86, align 4
-  store i32 %87, i32* %83, align 4
-  %88 = load i32, i32* %6, align 4
-  %89 = add nsw i32 %88, 1
-  store i32 %89, i32* %6, align 4
-  br label %90
+  %85 = add nsw i32 %84, 1
+  store i32 %85, i32* %6, align 4
+  br label %86
 
-90:
-  br label %91
+86:
+  br label %87
 
-91:
-  br label %92
+87:
+  br label %88
 
-92:
-  %93 = load i32, i32* %7, align 4
-  %94 = add nsw i32 %93, 1
-  store i32 %94, i32* %7, align 4
+88:
+  %89 = load i32, i32* %7, align 4
+  %90 = add nsw i32 %89, 1
+  store i32 %90, i32* %7, align 4
   br label %16
 
-95:
-  %96 = load i32, i32* %3, align 4
-  store i32 %96, i32* %7, align 4
-  br label %97
+91:
+  %92 = load i32, i32* %3, align 4
+  store i32 %92, i32* %7, align 4
+  br label %93
 
-97:
-  %98 = load i32, i32* %7, align 4
-  %99 = load i32, i32* %3, align 4
-  %100 = load i32, i32* %4, align 4
-  %101 = add nsw i32 %99, %100
-  %102 = sub nsw i32 %101, 1
-  %103 = icmp sle i32 %98, %102
-  br i1 %103, label %104, label %116
+93:
+  %94 = load i32, i32* %7, align 4
+  %95 = load i32, i32* %3, align 4
+  %96 = load i32, i32* %4, align 4
+  %97 = add nsw i32 %95, %96
+  %98 = sub nsw i32 %97, 1
+  %99 = icmp sle i32 %94, %98
+  br i1 %99, label %100, label %111
 
-104:
-  %105 = load i32, i32* %7, align 4
-  %106 = sext i32 %105 to i64
-  %107 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %106
-  %108 = load i32, i32* %107, align 4
+100:
+  %101 = load i32, i32* %7, align 4
+  %102 = sext i32 %101 to i64
+  %103 = getelementptr inbounds [101 x i32], [101 x i32]* @a, i64 0, i64 %102
+  %104 = load i32, i32* %7, align 4
+  %105 = sext i32 %104 to i64
+  %106 = getelementptr inbounds [101 x i32], [101 x i32]* @b, i64 0, i64 %105
+  %107 = load i32, i32* %106, align 4
+  store i32 %107, i32* %103, align 4
+  br label %108
+
+108:
   %109 = load i32, i32* %7, align 4
-  %110 = sext i32 %109 to i64
-  %111 = getelementptr inbounds [101 x i32], [101 x i32]* @b, i64 0, i64 %110
-  %112 = load i32, i32* %111, align 4
-  store i32 %112, i32* %108, align 4
-  br label %113
+  %110 = add nsw i32 %109, 1
+  store i32 %110, i32* %7, align 4
+  br label %93
 
-113:
-  %114 = load i32, i32* %7, align 4
-  %115 = add nsw i32 %114, 1
-  store i32 %115, i32* %7, align 4
-  br label %97
-
-116:
+111:
   ret void
 }
 
