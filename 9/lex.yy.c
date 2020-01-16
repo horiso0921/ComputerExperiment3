@@ -949,12 +949,12 @@ return LE;
 case 25:
 YY_RULE_SETUP
 #line 48 "scanner.l"
-return GE;
+return GT;
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 49 "scanner.l"
-return GT;
+return GE;
 	YY_BREAK
 case 27:
 YY_RULE_SETUP

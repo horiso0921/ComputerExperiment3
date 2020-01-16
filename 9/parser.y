@@ -76,7 +76,7 @@ program
         ;
 
 outblock
-        : var_decl_part subprog_decl_part statement 
+        : var_decl_part forward_decl_part subprog_decl_part statement 
         ;
 
 var_decl_part
@@ -93,6 +93,37 @@ var_decl
         : VAR id_list
         ;
 
+forward_decl_part
+        : /* empty */
+        | forward_decl_list SEMICOLON 
+        ;
+
+forward_decl_list
+        : forward_decl_list SEMICOLON forward_decl
+        | forward_decl
+        ;
+
+forward_decl
+        : FORWARD PROCEDURE IDENT
+        {
+                insert($3,2);
+        } forward_arg_list
+        | FORWARD FUNCTION IDENT
+        {
+                insert($3,2);
+        } forward_arg_list
+        ;
+
+forward_arg_list
+        : /* empty */
+        | LPAREN forward_arg RPAREN
+        ;
+
+forward_arg
+        : forward_arg COMMA IDENT
+        | IDENT
+        ;
+
 subprog_decl_part
         : /* empty */
         {
@@ -105,7 +136,8 @@ subprog_decl_part
                 Factor ftmp;
                 ftmp.type = LOCAL_VAR;
                 ftmp.cal = Last_Register;
-                ftmp.range = 0;
+                ftmp.off = 0;
+                ftmp.fin = 0;
                 factorpush(ftmp);
                 Last_Register++;
                 create_llvmcode(Alloca);
@@ -128,7 +160,8 @@ subprog_decl_part
                 Factor ftmp;
                 ftmp.type = LOCAL_VAR;
                 ftmp.cal = Last_Register;
-                ftmp.range = 0;
+                ftmp.off = 0;
+                ftmp.fin = 0;
                 factorpush(ftmp);
                 Last_Register++;
                 create_llvmcode(Alloca);
@@ -162,7 +195,8 @@ subprog_decl
                 tmp = lookup(decltl->fname);
                 arg1.type = LOCAL_VAR;
                 arg1.cal = tmp.ret;
-                arg1.range = 0;
+                arg1.off = 0;
+                arg1.fin = 0;
                 factorpush(arg1);
                 create_llvmcode(Load);
                 create_llvmcode(Ret);                
@@ -218,7 +252,8 @@ func_name
                 Factor f_tmp;
                 f_tmp.type = LOCAL_VAR;
                 f_tmp.cal = Last_Register++;
-                f_tmp.range = 0;
+                f_tmp.fin = 0;
+                f_tmp.off = 0;
                 factorpush(f_tmp);
                 create_llvmcode(Alloca);
         }
@@ -304,7 +339,8 @@ statement
         ;
 
 assignment_statement
-        : variable ASSIGN expression 
+        : variable
+        ASSIGN expression 
         {
                 create_llvmcode(Store);
         }
@@ -707,8 +743,10 @@ id_array
                 if(arity_decl==1)decltl->arity++;
                 Factor f_tmp;
                 f_tmp = insert($1, 0);
-                f_tmp.range = $5+1;
-                Stack_tl->range = $5+1;
+                f_tmp.off = $3;
+                f_tmp.fin = $5;
+                Stack_tl->fin = $5;
+                Stack_tl->off = $3;
                 factorpush(f_tmp); 
                 switch(Proc_Term){
                         case GLOBAL_VAR:
