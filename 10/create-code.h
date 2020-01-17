@@ -188,9 +188,9 @@ int Calcode(LLVMcommand command){
         retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
         retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
         Last_Register ++; /* カウンタをインクリメント */
-        (tmp->args).add.arg2 = arg2; /* 命令の第 1 引数を指定 */
-        (tmp->args).add.arg1 = arg1; /* 命令の第 2 引数を指定 */
-        (tmp->args).add.retval = retval; /* 結果のレジスタを指定 */
+        (tmp->args).calc.arg2 = arg2; /* 命令の第 1 引数を指定 */
+        (tmp->args).calc.arg1 = arg1; /* 命令の第 2 引数を指定 */
+        (tmp->args).calc.retval = retval; /* 結果のレジスタを指定 */
     }
     factorpush( retval );  /* 計算の結果をスタックにプッシュ */
     return 0;

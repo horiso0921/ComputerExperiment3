@@ -92,82 +92,82 @@ void displayLlvmcodes( LLVMcode *code){
                         fprintf(fp, "%d:\n",(code->args).label.l);
                         break;
                 case Add:
-                        displayFactor( (code->args).add.retval );
+                        displayFactor( (code->args).calc.retval );
                         fprintf(fp," = add nsw i32 ");
-                        displayFactor( (code->args).add.arg1);
+                        displayFactor( (code->args).calc.arg1);
                         fprintf(fp,", ");
-                        displayFactor( (code->args).add.arg2);
+                        displayFactor( (code->args).calc.arg2);
                         fprintf(fp,"\n");
                         break;
                 case Sub:
-                        displayFactor( (code->args).sub.retval);
+                        displayFactor( (code->args).calc.retval);
                         fprintf(fp," = sub nsw i32 ");
-                        displayFactor( (code->args).sub.arg1);
+                        displayFactor( (code->args).calc.arg1);
                         fprintf(fp,", ");
-                        displayFactor( (code->args).sub.arg2);
+                        displayFactor( (code->args).calc.arg2);
                         fprintf(fp,"\n");
                         break;
                 case Mul:
-                        displayFactor( (code->args).mul.retval);
-                        if ((code->args).mul.arg1.type == CONSTANT){
-                                for (j = 0; (1<<j)<(code->args).mul.arg1.cal;j++){
+                        displayFactor( (code->args).calc.retval);
+                        if ((code->args).calc.arg1.type == CONSTANT){
+                                for (j = 0; (1<<j)<(code->args).calc.arg1.cal;j++){
                                         continue;
                                 }
-                                if ((1 << j) == (code->args).mul.arg1.cal){
+                                if ((1 << j) == (code->args).calc.arg1.cal){
                                         fprintf(fp," = shl i32 ");
-                                        displayFactor( (code->args).mul.arg2);
+                                        displayFactor( (code->args).calc.arg2);
                                         fprintf(fp,", %d",j);
                                 } else {
                                         fprintf(fp," = mul nsw i32 ");
-                                        displayFactor( (code->args).mul.arg1);
+                                        displayFactor( (code->args).calc.arg1);
                                         fprintf(fp,", ");
-                                        displayFactor( (code->args).mul.arg2);
+                                        displayFactor( (code->args).calc.arg2);
                                 }
                         } else {
-                                if ((code->args).mul.arg2.type == CONSTANT){
-                                        for (j = 0; (1<<j)<(code->args).mul.arg2.cal;j++){
+                                if ((code->args).calc.arg2.type == CONSTANT){
+                                        for (j = 0; (1<<j)<(code->args).calc.arg2.cal;j++){
                                                 continue;
                                         }
-                                        if ((1 << j) == (code->args).mul.arg2.cal){
+                                        if ((1 << j) == (code->args).calc.arg2.cal){
                                                 fprintf(fp," = shl i32 ");
-                                                displayFactor( (code->args).mul.arg1);
+                                                displayFactor( (code->args).calc.arg1);
                                                 fprintf(fp,", %d",j);
                                         } else {
                                                 fprintf(fp," = mul nsw i32 ");
-                                                displayFactor( (code->args).mul.arg1);
+                                                displayFactor( (code->args).calc.arg1);
                                                 fprintf(fp,", ");
-                                                displayFactor( (code->args).mul.arg2);
+                                                displayFactor( (code->args).calc.arg2);
                                         }
                                 } else {
                                         fprintf(fp," = mul nsw i32 ");
-                                        displayFactor( (code->args).mul.arg1);
+                                        displayFactor( (code->args).calc.arg1);
                                         fprintf(fp,", ");
-                                        displayFactor( (code->args).mul.arg2);
+                                        displayFactor( (code->args).calc.arg2);
                                 }
                         }
                         fprintf(fp,"\n");
                         break;
                 case Div:
-                        displayFactor( (code->args).mul.retval);
-                        if ((code->args).mul.arg2.type == CONSTANT){
-                                for (j = 0; (1<<j)<(code->args).mul.arg2.cal;j++){
+                        displayFactor( (code->args).calc.retval);
+                        if ((code->args).calc.arg2.type == CONSTANT){
+                                for (j = 0; (1<<j)<(code->args).calc.arg2.cal;j++){
                                         continue;
                                 }
-                                if ((1 << j) == (code->args).mul.arg2.cal){
+                                if ((1 << j) == (code->args).calc.arg2.cal){
                                         fprintf(fp," = ashr i32 ");
-                                        displayFactor( (code->args).mul.arg1);
+                                        displayFactor( (code->args).calc.arg1);
                                         fprintf(fp,", %d",j);
                                 } else {
                                         fprintf(fp," = div nsw i32 ");
-                                        displayFactor( (code->args).mul.arg1);
+                                        displayFactor( (code->args).calc.arg1);
                                         fprintf(fp,", ");
-                                        displayFactor( (code->args).mul.arg2);
+                                        displayFactor( (code->args).calc.arg2);
                                 }
                         } else {
                                 fprintf(fp," = div nsw i32 ");
-                                displayFactor( (code->args).mul.arg1);
+                                displayFactor( (code->args).calc.arg1);
                                 fprintf(fp,", ");
-                                displayFactor( (code->args).mul.arg2);
+                                displayFactor( (code->args).calc.arg2);
                         }
                         fprintf(fp,"\n");
                         break;

@@ -22,11 +22,6 @@ LLVMcode *tmp;
 int Proc_Term = 0;
 int Last_Register = 1;
 Cmptype icmptype;
-int arity_decl = 0;
-int i;
-int if_flg;
-int Func_Term = 0;
-
 
 %}
 
@@ -49,10 +44,11 @@ int Func_Term = 0;
 %token PERIOD ASSIGN
 %token <num> NUMBER
 %token <ident> IDENT
+
 %%
 
 program
-        : PROGRAM {init_fstack();} IDENT SEMICOLON outblock PERIOD
+        : PROGRAM {init_fstack();}IDENT SEMICOLON outblock PERIOD
         {
                 Factor retval;
                 retval.type = CONSTANT;
@@ -75,7 +71,7 @@ program
         ;
 
 outblock
-        : var_decl_part forward_decl_part subprog_decl_part statement 
+        : var_decl_part subprog_decl_part statement
         ;
 
 var_decl_part
@@ -92,37 +88,6 @@ var_decl
         : VAR id_list
         ;
 
-forward_decl_part
-        : /* empty */
-        | forward_decl_list SEMICOLON 
-        ;
-
-forward_decl_list
-        : forward_decl_list SEMICOLON forward_decl
-        | forward_decl
-        ;
-
-forward_decl
-        : FORWARD PROCEDURE IDENT
-        {
-                insert($3,2);
-        } forward_arg_list
-        | FORWARD FUNCTION IDENT
-        {
-                insert($3,2);
-        } forward_arg_list
-        ;
-
-forward_arg_list
-        : /* empty */
-        | LPAREN forward_arg RPAREN
-        ;
-
-forward_arg
-        : forward_arg COMMA IDENT
-        | IDENT
-        ;
-
 subprog_decl_part
         : /* empty */
         {
@@ -135,8 +100,6 @@ subprog_decl_part
                 Factor ftmp;
                 ftmp.type = LOCAL_VAR;
                 ftmp.cal = Last_Register;
-                ftmp.off = 0;
-                ftmp.fin = 0;
                 factorpush(ftmp);
                 Last_Register++;
                 create_llvmcode(Alloca);
@@ -149,6 +112,7 @@ subprog_decl_part
         }
         | subprog_decl_list SEMICOLON
         {
+
                 Fundecl *tmp;
                 tmp = (Fundecl *)malloc(sizeof(Fundecl));
                 strcpy(tmp->fname , "main");
@@ -159,8 +123,6 @@ subprog_decl_part
                 Factor ftmp;
                 ftmp.type = LOCAL_VAR;
                 ftmp.cal = Last_Register;
-                ftmp.off = 0;
-                ftmp.fin = 0;
                 factorpush(ftmp);
                 Last_Register++;
                 create_llvmcode(Alloca);
@@ -179,35 +141,17 @@ subprog_decl_list
         ;
 
 subprog_decl
-        :  proc_decl
+        : proc_decl
         {
-                delete(); 
-                Proc_Term--;
                 Factor retval;
                 strcpy(retval.val,"void");
                 factorpush(retval);
                 create_llvmcode(Ret);
         }
-        | func_decl
-        {
-                Factor tmp, arg1;
-                tmp = lookup(decltl->fname);
-                arg1.type = LOCAL_VAR;
-                arg1.cal = tmp.ret;
-                arg1.off = 0;
-                arg1.fin = 0;
-                factorpush(arg1);
-                create_llvmcode(Load);
-                create_llvmcode(Ret);                
-                delete(); 
-                Proc_Term--;
-                Func_Term--;
-        }
         ;
 
 proc_decl
         : PROCEDURE proc_name SEMICOLON inblock
-        | PROCEDURE proc_name LPAREN {arity_decl=1;} id_list {arity_decl=0;} RPAREN SEMICOLON inblock
         ;
 
 proc_name
@@ -218,49 +162,16 @@ proc_name
                 tmp = (Fundecl *)malloc(sizeof(Fundecl));
                 strcpy(tmp->fname , $1);
                 tmp->codes = NULL;
-                tmp->arity = 0;
-                tmp->rettype = vo;
                 if (declhd == NULL) declhd = tmp;
                 if (decltl != NULL) decltl->next = tmp;
                 decltl = tmp; 
                 codetl = NULL;
-                Proc_Term++;
         }
         ;
 
-func_decl
-        : FUNCTION func_name SEMICOLON inblock
-        | FUNCTION func_name LPAREN {arity_decl=1;} id_list {arity_decl=0;} RPAREN SEMICOLON inblock
-
-func_name
-        : IDENT
-        {
-                insert($1, 2);
-                Fundecl *tmp;
-                tmp = (Fundecl *)malloc(sizeof(Fundecl));
-                strcpy(tmp->fname , $1);
-                tmp->codes = NULL;
-                tmp->arity = 0;
-                tmp->rettype = I32;
-                if (declhd == NULL) declhd = tmp;
-                if (decltl != NULL) decltl->next = tmp;
-                decltl = tmp; 
-                codetl = NULL;
-                Proc_Term++;
-                Func_Term++;
-                Factor f_tmp;
-                f_tmp.type = LOCAL_VAR;
-                f_tmp.cal = Last_Register++;
-                f_tmp.fin = 0;
-                f_tmp.off = 0;
-                factorpush(f_tmp);
-                create_llvmcode(Alloca);
-        }
-        ;
 inblock
-        :  var_decl_part {Arity_Alloca();} statement 
+        : {Proc_Term++;} var_decl_part statement {delete(); Proc_Term--;}
         ;
-
 
 statement_list
         : statement_list SEMICOLON statement
@@ -311,23 +222,6 @@ statement
                 br_decl = br_decl->before;
         }
         | proc_call_statement
-        {
-                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
-                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
-                tmp->command = Call; /* 命令の種類を加算に設定 */
-                Factor arg;
-                for (i = 0; i < 11;i++){
-                        arg = factorpop();
-                        if(arg.type == PROC_NAME){
-                                break;
-                        }
-                        (tmp->args).call.args[i] = arg;
-                }
-                (tmp->args).call.arity = i;
-                (tmp->args).call.proc = arg;
-                (tmp->args).call.rettype = vo;
-                add_llvmnode(tmp);
-        }
         | null_statement
         | block_statement
         | read_statement
@@ -335,47 +229,11 @@ statement
         ;
 
 assignment_statement
-        : variable ASSIGN expression 
+        : IDENT {factorpush(lookup($1));} ASSIGN expression 
         {
                 create_llvmcode(Store);
         }
         ;
-
-variable
-        : entire_variable
-        | component_variable
-        {
-                create_llvmcode(GetElem);
-        }
-        ;
-
-entire_variable
-        : variable_id
-        ;
-
-variable_id
-        : IDENT
-        {
-                factorpush(lookup($1));
-        }
-        ;
-
-component_variable
-        : indexed_variable
-        ;
-
-indexed_variable
-        : array_variable LBRACKET expression 
-        {
-                create_llvmcode(Sext);
-        }
-        RBRACKET
-        ;
-
-array_variable 
-        : variable
-
-
 
 if_statement 
         : IF condition 
@@ -512,6 +370,7 @@ for_statement
                 create_llvmcode(Store);
         }
         {
+                
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
                 tmp->command = BrUncond; /* 命令の種類を加算に設定 */
@@ -522,22 +381,33 @@ for_statement
 
 proc_call_statement
         : proc_call_name
-        | proc_call_name LPAREN arg_list RPAREN
         ;
 
 proc_call_name 
-        : IDENT {factorpush(lookup($1));}
+        : IDENT 
+        {
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Call; /* 命令の種類を加算に設定 */
+                lookup($1);
+                strcpy((tmp->args).call.funcname, $1);
+                (tmp->args).call.rettype = vo;
+                Factor arg1;
+                strcpy(arg1.val, "void");
+                (tmp->args).call.arg1 = arg1;
+                add_llvmnode(tmp);
+        }
         ;
-
 
 block_statement
         : SBEGIN statement_list SEND
         ;
 
-read_statement
-        : READ LPAREN variable RPAREN 
+read_statement 
+        : READ LPAREN IDENT {factorpush(lookup($3));} RPAREN 
         {
-                Factor proc, arg1, retval; /* 加算の引数・結果 */
+                
+                Factor arg1, retval; /* 加算の引数・結果 */
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
                 tmp->command = Call; /* 命令の種類を加算に設定 */
@@ -545,10 +415,9 @@ read_statement
                 retval.type = LOCAL_VAR;
                 retval.cal = Last_Register;
                 Last_Register ++;
-                strcpy(proc.val, "read");
-                (tmp->args).call.proc = proc;
-                (tmp->args).call.args[0] = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).call.arg1 = arg1; /* 命令の第 1 引数を指定 */
                 (tmp->args).call.retval = retval; /* 命令の第 2 引数を指定 */
+                strcpy((tmp->args).call.funcname, "read");
                 (tmp->args).call.rettype = I32;
                 add_llvmnode(tmp);
         }
@@ -557,7 +426,8 @@ read_statement
 write_statement 
         : WRITE LPAREN expression RPAREN
         {
-                Factor proc, arg1, retval; /* 加算の引数・結果 */
+                
+                Factor arg1, retval; /* 加算の引数・結果 */
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
                 tmp->command = Call; /* 命令の種類を加算に設定 */
@@ -565,12 +435,11 @@ write_statement
                 retval.type = LOCAL_VAR;
                 retval.cal = Last_Register;
                 Last_Register ++;
-                strcpy(proc.val, "write");
-                (tmp->args).call.proc = proc;
-                (tmp->args).call.args[0] = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).call.arg1 = arg1; /* 命令の第 1 引数を指定 */
                 (tmp->args).call.retval = retval; /* 命令の第 2 引数を指定 */
+                strcpy((tmp->args).call.funcname, "write");
                 (tmp->args).call.rettype = I32;
-                add_llvmnode(tmp);
+                add_llvmnode(tmp);  
         }
         ;
 
@@ -580,7 +449,7 @@ null_statement
 
 condition 
         : expression EQ expression
-        { 
+        {
                 icmptype = EQUAL;
                 create_llvmcode(Icmp);
         }
@@ -638,7 +507,7 @@ expression
 term 
         : factor
         | term MULT factor
-        { 
+        {
                 create_llvmcode(Mul);
         }
         ;
@@ -647,9 +516,10 @@ term
                 create_llvmcode(Div);
         }
         ;
+        ;
 
 factor 
-        : variable
+        : var_name
         {
                 create_llvmcode(Load);
         }
@@ -661,39 +531,11 @@ factor
                 factorpush(tmp);
         }
         | LPAREN expression RPAREN
-        | func_call
-        {       
-                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
-                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
-                tmp->command = Call; /* 命令の種類を加算に設定 */
-                Factor arg;
-                for (i = 0; i < 11;i++){
-                        arg = factorpop();
-                        if(arg.type == PROC_NAME){
-                                break;
-                        }
-                        (tmp->args).call.args[i] = arg;
-                }
-                (tmp->args).call.arity = i;
-                (tmp->args).call.proc = arg;
-                (tmp->args).call.rettype = I32;
-                Factor retval;
-                retval.type = LOCAL_VAR;
-                retval.cal = Last_Register++;
-                (tmp->args).call.retval = retval;
-                add_llvmnode(tmp);
-                factorpush(retval);
-        }
         ;
 
-func_call
-        : func_call_name LPAREN arg_list RPAREN
-        ;
-
-func_call_name 
+var_name 
         : IDENT {factorpush(lookup($1));}
         ;
-
 
 arg_list 
         : expression
@@ -701,19 +543,8 @@ arg_list
         ;
 
 id_list
-        : var_id
-        | id_list COMMA var_id
-        ;
-
-var_id
-        : id_var
-        | id_array
-        ;
-
-id_var
-        : IDENT
+        : IDENT 
         { 
-                if(arity_decl==1)decltl->arity++;
                 factorpush(insert($1, 0)); 
                 switch(Proc_Term){
                         case GLOBAL_VAR:
@@ -724,19 +555,10 @@ id_var
                                 break;
                 }
         }
-        ;
 
-id_array
-        : IDENT LBRACKET NUMBER INTERVAL NUMBER RBRACKET
+        | id_list COMMA IDENT 
         { 
-                if(arity_decl==1)decltl->arity++;
-                Factor f_tmp;
-                f_tmp = insert($1, 0);
-                f_tmp.off = $3;
-                f_tmp.fin = $5;
-                Stack_tl->fin = $5;
-                Stack_tl->off = $3;
-                factorpush(f_tmp); 
+                factorpush(insert($3, 0)); 
                 switch(Proc_Term){
                         case GLOBAL_VAR:
                                 create_llvmcode(Global);
@@ -746,7 +568,7 @@ id_array
                                 break;
                 }
         }
-        ; 
+        ;
 
 %% 
 

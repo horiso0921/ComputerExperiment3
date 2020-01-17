@@ -8,6 +8,8 @@ begin
       m := m - 1;
    if m = 1 then
       write(x)
+   else 
+      write(m)
 end;
 begin
    read(n);

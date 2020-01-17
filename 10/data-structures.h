@@ -87,18 +87,9 @@ typedef struct llvmcode {
     struct { /* label  */
       int l;
     } label;
-    struct { /* add    */
+    struct { /* add sub mul div   */
       Factor arg1;  Factor arg2;  Factor retval;
-    } add;
-    struct { /* sub    */
-      Factor arg1;  Factor arg2;  Factor retval;
-    } sub;
-    struct { /* mul    */
-      Factor arg1;  Factor arg2;  Factor retval;
-    } mul;
-    struct { /* div    */
-      Factor arg1;  Factor arg2;  Factor retval;
-    } div;
+    } calc;
     struct { /* icmp   */
       Cmptype type;  Factor arg1;  Factor arg2;  Factor retval;
     } icmp;
@@ -160,7 +151,7 @@ Fundecl *global_decl = NULL;
 
 /* 分岐命令のラベル番号の定義 */
 typedef struct brdecl{
-  int cond; int coll; int uncoll; int inc; int eluncoll;
+  int cond; int coll; int uncoll; int inc; int end;
   struct brdecl *next;
   struct brdecl *before;
 } Brdecl;

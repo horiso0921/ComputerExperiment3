@@ -178,35 +178,35 @@ void displayLlvmcodes( LLVMcode *code ,FILE *fp){
                         fprintf(fp,", align 4\n");
                         break;
                 case Add:
-                        displayFactor( (code->args).add.retval ,fp);
+                        displayFactor( (code->args).cal.retval ,fp);
                         fprintf(fp," = add nsw i32 ");
-                        displayFactor( (code->args).add.arg1,fp);
+                        displayFactor( (code->args).cal.arg1,fp);
                         fprintf(fp,", ");
-                        displayFactor( (code->args).add.arg2,fp);
+                        displayFactor( (code->args).cal.arg2,fp);
                         fprintf(fp,"\n");
                         break;
                 case Sub:
-                        displayFactor( (code->args).sub.retval,fp );
+                        displayFactor( (code->args).cal.retval,fp );
                         fprintf(fp," = sub nsw i32 ");
-                        displayFactor( (code->args).sub.arg1,fp);
+                        displayFactor( (code->args).cal.arg1,fp);
                         fprintf(fp,", ");
-                        displayFactor( (code->args).sub.arg2,fp);
+                        displayFactor( (code->args).cal.arg2,fp);
                         fprintf(fp,"\n");
                         break;
                 case Mul:
-                        displayFactor( (code->args).mul.retval,fp );
+                        displayFactor( (code->args).cal.retval,fp );
                         fprintf(fp," = mul nsw i32 ");
-                        displayFactor( (code->args).mul.arg1,fp);
+                        displayFactor( (code->args).cal.arg1,fp);
                         fprintf(fp,", ");
-                        displayFactor( (code->args).mul.arg2,fp);
+                        displayFactor( (code->args).cal.arg2,fp);
                         fprintf(fp,"\n");
                         break;
                 case Div:
-                        displayFactor( (code->args).div.retval,fp );
+                        displayFactor( (code->args).cal.retval,fp );
                         fprintf(fp," = sdiv i32 ");
-                        displayFactor( (code->args).div.arg1,fp);
+                        displayFactor( (code->args).cal.arg1,fp);
                         fprintf(fp,", ");
-                        displayFactor( (code->args).div.arg2,fp);
+                        displayFactor( (code->args).cal.arg2,fp);
                         fprintf(fp,"\n");
                         break;
                 case Ret:
@@ -999,9 +999,9 @@ case 53:
                 retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
                 retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
                 Last_Register ++; /* カウンタをインクリメント */
-                (tmp->args).add.arg1 = arg1; /* 命令の第 1 引数を指定 */
-                (tmp->args).add.arg2 = arg2; /* 命令の第 2 引数を指定 */
-                (tmp->args).add.retval = retval; /* 結果のレジスタを指定 */
+                (tmp->args).cal.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).cal.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).cal.retval = retval; /* 結果のレジスタを指定 */
                 add_node(tmp);
                 factorpush( retval ); /* 加算の結果をスタックにプッシュ */
         }
@@ -1019,9 +1019,9 @@ case 54:
                 retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
                 retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
                 Last_Register ++; /* カウンタをインクリメント */
-                (tmp->args).sub.arg1 = arg1; /* 命令の第 1 引数を指定 */
-                (tmp->args).sub.arg2 = arg2; /* 命令の第 2 引数を指定 */
-                (tmp->args).sub.retval = retval; /* 結果のレジスタを指定 */
+                (tmp->args).cal.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).cal.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).cal.retval = retval; /* 結果のレジスタを指定 */
                 add_node(tmp);
                 factorpush( retval ); /* 加算の結果をスタックにプッシュ */
         }
@@ -1039,9 +1039,9 @@ case 56:
                 retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
                 retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
                 Last_Register ++; /* カウンタをインクリメント */
-                (tmp->args).mul.arg1 = arg1; /* 命令の第 1 引数を指定 */
-                (tmp->args).mul.arg2 = arg2; /* 命令の第 2 引数を指定 */
-                (tmp->args).mul.retval = retval; /* 結果のレジスタを指定 */
+                (tmp->args).cal.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).cal.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).cal.retval = retval; /* 結果のレジスタを指定 */
                 add_node(tmp);
                 factorpush( retval ); /* 加算の結果をスタックにプッシュ */
         }
@@ -1059,9 +1059,9 @@ case 57:
                 retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
                 retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
                 Last_Register ++; /* カウンタをインクリメント */
-                (tmp->args).div.arg1 = arg1; /* 命令の第 1 引数を指定 */
-                (tmp->args).div.arg2 = arg2; /* 命令の第 2 引数を指定 */
-                (tmp->args).div.retval = retval; /* 結果のレジスタを指定 */
+                (tmp->args).cal.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).cal.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).cal.retval = retval; /* 結果のレジスタを指定 */
                 add_node(tmp);
                 factorpush( retval ); /* 加算の結果をスタックにプッシュ */
         }
