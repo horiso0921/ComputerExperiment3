@@ -7,8 +7,9 @@ var i;
    procedure check(p);
    var i; 
    begin  
-      i := p;
-      while i <= 100 do
+      i := p;   
+      
+      while i < 100 do
       begin
 	 a[i] := 1;
 	 i := i + p;
@@ -21,7 +22,8 @@ begin
       for i := 2 to n do
 	 if a[i] = 0 then 
 	 begin
-	    write(i);
+      a[100] := 1;
+	    write(n);
 	    check(i);
 	 end
 end.

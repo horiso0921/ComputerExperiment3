@@ -342,38 +342,33 @@ assignment_statement
         ;
 
 variable
-        : entire_variable
-        | component_variable
+        : IDENT
+        {
+                Factor f_tmp;
+                f_tmp = lookup($1);
+                factorpush(f_tmp);
+                $$ = f_tmp.off;
+        }
+        | indexed_variable
         {
                 create_llvmcode(GetElem);
         }
         ;
 
-entire_variable
-        : variable_id
-        ;
-
-variable_id
-        : IDENT
-        {
-                factorpush(lookup($1));
-        }
-        ;
-
-component_variable
-        : indexed_variable
-        ;
 
 indexed_variable
-        : array_variable LBRACKET expression 
+        : variable LBRACKET expression 
         {
+                Factor f_tmp;
+                f_tmp.type = CONSTANT;
+                f_tmp.cal = $1;
+                factorpush(f_tmp);
+                create_llvmcode(Sub);
                 create_llvmcode(Sext);
         }
         RBRACKET
         ;
 
-array_variable 
-        : variable
 
 
 
