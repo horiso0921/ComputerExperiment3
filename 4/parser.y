@@ -330,7 +330,7 @@ subprog_decl_part
                 LLVMcode *x;
                 x = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 x->next = NULL; /* 次の命令へのポインタを初期化 */
-                x->command = Alloca; /* 命令の種類を加算に設定 */
+                x->command = Alloca; 
                 (x->args).alloca.retval = ftmp; /* 命令の第 2 引数を指定 */
                 add_node(x);
                 factorpush(ftmp);
@@ -339,12 +339,12 @@ subprog_decl_part
                 f1tmp.cal = 0;
                 factorpush(f1tmp);
                 LLVMcode *ltmp; /* 生成した命令へのポインタ */
-                Factor arg1, arg2; /* 加算の引数・結果 */
+                Factor arg1, arg2; 
                 ltmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 ltmp->next = NULL; /* 次の命令へのポインタを初期化 */
-                ltmp->command = Store; /* 命令の種類を加算に設定 */
-                arg1 = factorpop();/*スタックから第2引数をポップ*/
-                arg2 = factorpop();/*スタックから第1引数をポップ*/
+                ltmp->command = Store; 
+                arg1 = factorpop();/*スタックから第1引数をポップ*/
+                arg2 = factorpop();/*スタックから第2引数をポップ*/
                 (ltmp->args).store.arg1 = arg1; /* 命令の第 1 引数を指定 */
                 (ltmp->args).store.arg2 = arg2; /* 命令の第 2 引数を指定 */
                 add_node(ltmp);
@@ -365,7 +365,7 @@ subprog_decl_part
                 LLVMcode *x;
                 x = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 x->next = NULL; /* 次の命令へのポインタを初期化 */
-                x->command = Alloca; /* 命令の種類を加算に設定 */
+                x->command = Alloca; 
                 (x->args).alloca.retval = ftmp; /* 命令の第 2 引数を指定 */
                 add_node(x);
                 factorpush(ftmp);
@@ -374,12 +374,12 @@ subprog_decl_part
                 f1tmp.cal = 0;
                 factorpush(f1tmp);
                 LLVMcode *ltmp; /* 生成した命令へのポインタ */
-                Factor arg1, arg2; /* 加算の引数・結果 */
+                Factor arg1, arg2; 
                 ltmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 ltmp->next = NULL; /* 次の命令へのポインタを初期化 */
-                ltmp->command = Store; /* 命令の種類を加算に設定 */
-                arg1 = factorpop();/*スタックから第2引数をポップ*/
-                arg2 = factorpop();/*スタックから第1引数をポップ*/
+                ltmp->command = Store; 
+                arg1 = factorpop();/*スタックから第1引数をポップ*/
+                arg2 = factorpop();/*スタックから第2引数をポップ*/
                 (ltmp->args).store.arg1 = arg1; /* 命令の第 1 引数を指定 */
                 (ltmp->args).store.arg2 = arg2; /* 命令の第 2 引数を指定 */
                 add_node(ltmp);
@@ -449,12 +449,12 @@ assignment_statement
         : IDENT {factorpush(lookup($1));} ASSIGN expression 
         {
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
-                Factor arg1, arg2; /* 加算の引数・結果 */
+                Factor arg1, arg2;
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
                 tmp->command = Store; /* 命令の種類を加算に設定 */
-                arg1 = factorpop();/*スタックから第2引数をポップ*/
-                arg2 = factorpop();/*スタックから第1引数をポップ*/
+                arg1 = factorpop();/*スタックから第1引数をポップ*/
+                arg2 = factorpop();/*スタックから第2引数をポップ*/
                 (tmp->args).store.arg1 = arg1; /* 命令の第 1 引数を指定 */
                 (tmp->args).store.arg2 = arg2; /* 命令の第 2 引数を指定 */
                 add_node(tmp);
@@ -515,7 +515,30 @@ condition
 expression 
         : term
         | PLUS term
-        | MINUS term
+        | MINUS
+        {
+                Factor arg1;
+                arg1.type = CONSTANT;/*第1引数*/
+                arg1.cal = 0;
+                factorpush(arg1);
+        } term
+        {
+                LLVMcode *tmp; /* 生成した命令へのポインタ */
+                Factor arg1, arg2, retval; /* 減算の引数・結果 */
+                tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
+                tmp->next = NULL; /* 次の命令へのポインタを初期化 */
+                tmp->command = Sub; /* 命令の種類を減算に設定 */
+                arg2 = factorpop();/*スタックから第2引数をポップ*/
+                arg1 = factorpop();/*スタックから第1引数をポップ*/
+                retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
+                retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
+                Last_Register ++; /* カウンタをインクリメント */
+                (tmp->args).cal.arg1 = arg1; /* 命令の第 1 引数を指定 */
+                (tmp->args).cal.arg2 = arg2; /* 命令の第 2 引数を指定 */
+                (tmp->args).cal.retval = retval; /* 結果のレジスタを指定 */
+                add_node(tmp);
+                factorpush( retval ); /* 減算の結果をスタックにプッシュ */
+        }
         | expression PLUS term
         {
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
@@ -593,7 +616,6 @@ term
                 add_node(tmp);
                 factorpush( retval ); /* 加算の結果をスタックにプッシュ */
         }
-        ;
         ;
 
 factor 

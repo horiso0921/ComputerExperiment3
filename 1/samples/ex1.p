@@ -1,5 +1,7 @@
-program EX1-1;
-var Begin;
+program EX1;
+var x, y, z;
 begin
-   Begin := 21;
+   x := 12;
+   y := 20;
+   z := x + y
 end.
