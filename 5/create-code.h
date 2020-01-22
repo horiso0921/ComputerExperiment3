@@ -61,19 +61,21 @@ void create_llvmcode(LLVMcommand command){
     }
     if (command != Global){add_llvmnode(tmp);}
     else{add_globalnode(tmp);}
-
 }
 
 void Allocacode(){
     (tmp->args).alloca.retval = factorpop();
 }
+
 void Globalcode(){
-    (tmp->args).global.retval = factorpop(); /* 命令の第 2 引数を指定 */
+    (tmp->args).global.retval = factorpop(); 
 }
+
 void Storecode(){
     (tmp->args).store.arg1 = factorpop(); /* 命令の第 1 引数を指定 */
     (tmp->args).store.arg2 = factorpop(); /* 命令の第 2 引数を指定 */
 }
+
 void Loadcode(){
     Factor retval;
     retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
@@ -83,32 +85,37 @@ void Loadcode(){
     (tmp->args).load.retval = retval;
     factorpush(retval);
 }
+
 void BrUncondcode(){
     int *x;
     *x = Last_Register;
     (tmp->args).bruncond.arg1 = x;
 }
+
 void BrCondcode(){
     (tmp->args).brcond.arg1 = factorpop();
     (tmp->args).brcond.arg2 = &br_decl->coll;
     (tmp->args).brcond.arg3 = &br_decl->uncoll;
     br_decl->coll = Last_Register;
 }
+
 void Labelcode(){
     (tmp->args).label.l = Last_Register;
 }
+
 void Calcode(){
     Factor retval;
     retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
     retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
     Last_Register ++; /* カウンタをインクリメント */
-    (tmp->args).calc.arg2 = factorpop(); /* 命令の第 1 引数を指定 */
-    (tmp->args).calc.arg1 = factorpop(); /* 命令の第 2 引数を指定 */
+    (tmp->args).calc.arg2 = factorpop(); /* 命令の第 2 引数を指定 */
+    (tmp->args).calc.arg1 = factorpop(); /* 命令の第 1 引数を指定 */
     (tmp->args).calc.retval = retval; /* 結果のレジスタを指定 */
     factorpush( retval );  /* 計算の結果をスタックにプッシュ */
 }
+
 void Icmpcode(){    
-    Factor arg1, arg2, retval; /* 加算の引数・結果 */
+    Factor arg1, arg2, retval; 
     retval.type = LOCAL_VAR;
     retval.cal = Last_Register;
     Last_Register++;
@@ -116,10 +123,11 @@ void Icmpcode(){
     arg1 = factorpop();/*スタックから第1引数をポップ*/
     (tmp->args).icmp.arg1 = arg1; /* 命令の第 1 引数を指定 */
     (tmp->args).icmp.arg2 = arg2; /* 命令の第 2 引数を指定 */
-    (tmp->args).icmp.retval = retval; /* 命令の第 1 引数を指定 */
+    (tmp->args).icmp.retval = retval; 
     (tmp->args).icmp.type = icmptype;
     factorpush(retval);
 }
+
 void Callcode(){}
 void Retcode(){
     (tmp->args).ret.arg1 = factorpop();

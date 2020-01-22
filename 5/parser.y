@@ -150,6 +150,7 @@ subprog_decl
         }
         ;
 
+
 proc_decl
         : PROCEDURE proc_name SEMICOLON inblock
         ;
@@ -282,7 +283,6 @@ while_statement
         } condition 
         {
                 create_llvmcode(BrCond);
-                add_llvmnode(tmp);
         } DO 
         {
                 create_llvmcode(Label);
@@ -318,12 +318,8 @@ for_statement
                 tmp->next = NULL;
                 (tmp->args).bruncond.arg1 = &br_decl->cond;
                 add_llvmnode(tmp);
-        }
-        {
                 create_llvmcode(Label);
                 Last_Register++;
-        }
-        {
                 factorpush(lookup($2));
                 create_llvmcode(Load);
         }
@@ -335,8 +331,6 @@ for_statement
                 DO 
         {
                 create_llvmcode(BrCond);
-        }
-        {
                 create_llvmcode(Label);
                 Last_Register ++;
         }
@@ -347,33 +341,21 @@ for_statement
                 tmp->next = NULL;
                 (tmp->args).bruncond.arg1 = &br_decl->inc;
                 add_llvmnode(tmp);
-        }
-        {
                 create_llvmcode(Label);
                 br_decl->inc = Last_Register;
                 Last_Register ++;
-        }
-        {
                 factorpush(lookup($2));
                 factorpush(lookup($2));
                 create_llvmcode(Load);
-        }
-        {
-                
-                Factor arg2; /* 加算の引数・結果 */
+                Factor arg2; 
                 arg2.type = CONSTANT;
                 arg2.cal = 1;
                 factorpush(arg2);
                 create_llvmcode(Add);
-        }
-        {
-                create_llvmcode(Store);
-        }
-        {
-                
+                create_llvmcode(Store);                
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
-                tmp->command = BrUncond; /* 命令の種類を加算に設定 */
+                tmp->command = BrUncond;
                 (tmp->args).bruncond.arg1 = &br_decl->cond;
                 add_llvmnode(tmp);
         }
@@ -388,7 +370,7 @@ proc_call_name
         {
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
-                tmp->command = Call; /* 命令の種類を加算に設定 */
+                tmp->command = Call; 
                 lookup($1);
                 strcpy((tmp->args).call.funcname, $1);
                 (tmp->args).call.rettype = vo;
@@ -407,16 +389,16 @@ read_statement
         : READ LPAREN IDENT {factorpush(lookup($3));} RPAREN 
         {
                 
-                Factor arg1, retval; /* 加算の引数・結果 */
+                Factor arg1, retval; 
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
-                tmp->command = Call; /* 命令の種類を加算に設定 */
-                arg1 = factorpop();/*スタックから第2引数をポップ*/
+                tmp->command = Call; 
+                arg1 = factorpop();/*スタックから第1引数をポップ*/
                 retval.type = LOCAL_VAR;
                 retval.cal = Last_Register;
                 Last_Register ++;
                 (tmp->args).call.arg1 = arg1; /* 命令の第 1 引数を指定 */
-                (tmp->args).call.retval = retval; /* 命令の第 2 引数を指定 */
+                (tmp->args).call.retval = retval; 
                 strcpy((tmp->args).call.funcname, "read");
                 (tmp->args).call.rettype = I32;
                 add_llvmnode(tmp);
@@ -427,16 +409,16 @@ write_statement
         : WRITE LPAREN expression RPAREN
         {
                 
-                Factor arg1, retval; /* 加算の引数・結果 */
+                Factor arg1, retval; 
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
-                tmp->command = Call; /* 命令の種類を加算に設定 */
-                arg1 = factorpop();/*スタックから第2引数をポップ*/
+                tmp->command = Call; 
+                arg1 = factorpop();/*スタックから第1引数をポップ*/
                 retval.type = LOCAL_VAR;
                 retval.cal = Last_Register;
                 Last_Register ++;
                 (tmp->args).call.arg1 = arg1; /* 命令の第 1 引数を指定 */
-                (tmp->args).call.retval = retval; /* 命令の第 2 引数を指定 */
+                (tmp->args).call.retval = retval; 
                 strcpy((tmp->args).call.funcname, "write");
                 (tmp->args).call.rettype = I32;
                 add_llvmnode(tmp);  
