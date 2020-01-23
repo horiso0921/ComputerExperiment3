@@ -16,6 +16,7 @@ void displayFactor(Factor factor) {
         }
 }
 
+
 void displayCmptype( Cmptype cmptype) {
         switch(cmptype){
                 case EQUAL:

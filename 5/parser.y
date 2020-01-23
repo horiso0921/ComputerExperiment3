@@ -38,6 +38,7 @@ Cmptype icmptype;
 %left PLUS MINUS
 %left MULT DIV
 
+%token PP
 %token EQ NEQ LE LT GE GT
 %token LPAREN RPAREN LBRACKET RBRACKET
 %token COMMA SEMICOLON COLON INTERVAL
@@ -58,8 +59,8 @@ program
                 char fname[256];
                 strcpy(fname, "result.ll");
                 fp = fopen(fname, "wb");
-                fprintf(fp,"@.str = private unnamed_addr constant [3 x i8] c\"%%d\\00\", align 1\n");
-                fprintf(fp, "@.str.1 = private unnamed_addr constant [4 x i8] c\"%%d\\0A\\00\", align 1\n");
+                fprintf(fp,"@.str = private constant [3 x i8] c\"%%d\\00\", align 1\n");
+                fprintf(fp, "@.str.1 = private constant [4 x i8] c\"%%d\\0A\\00\", align 1\n");
                 fprintf(fp, "declare i32 @__isoc99_scanf(i8*, ...)\n");
                 fprintf(fp, "declare i32 @printf(i8*, ...)\n");
                 if(global_decl != NULL ) {displayLlvmcodes(global_decl->codes);
@@ -492,7 +493,6 @@ term
         {
                 create_llvmcode(Mul);
         }
-        ;
         | term DIV factor
         {
                 create_llvmcode(Div);

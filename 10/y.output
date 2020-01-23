@@ -88,125 +88,117 @@
 
   52  assignment_statement : variable ASSIGN expression
 
-  53  variable : entire_variable
-  54           | component_variable
+  53  variable : IDENT
+  54           | indexed_variable
 
-  55  entire_variable : variable_id
+  55  $$11 :
 
-  56  variable_id : IDENT
+  56  indexed_variable : variable LBRACKET expression $$11 RBRACKET
 
-  57  component_variable : indexed_variable
+  57  $$12 :
 
-  58  $$11 :
+  58  $$13 :
 
-  59  indexed_variable : array_variable LBRACKET expression $$11 RBRACKET
+  59  $$14 :
 
-  60  array_variable : variable
+  60  if_statement : IF condition $$12 THEN $$13 statement $$14 else_statement
 
-  61  $$12 :
+  61  else_statement :
 
-  62  $$13 :
+  62  $$15 :
 
-  63  $$14 :
+  63  else_statement : ELSE $$15 statement
 
-  64  if_statement : IF condition $$12 THEN $$13 statement $$14 else_statement
+  64  $$16 :
 
-  65  else_statement :
+  65  $$17 :
 
-  66  $$15 :
+  66  $$18 :
 
-  67  else_statement : ELSE $$15 statement
+  67  while_statement : WHILE $$16 condition $$17 DO $$18 statement
 
-  68  $$16 :
+  68  $$19 :
 
-  69  $$17 :
+  69  $$20 :
 
-  70  $$18 :
+  70  $$21 :
 
-  71  while_statement : WHILE $$16 condition $$17 DO $$18 statement
+  71  $$22 :
 
-  72  $$19 :
+  72  $$23 :
 
-  73  $$20 :
+  73  $$24 :
 
-  74  $$21 :
+  74  $$25 :
 
-  75  $$22 :
+  75  $$26 :
 
-  76  $$23 :
+  76  $$27 :
 
-  77  $$24 :
+  77  $$28 :
 
-  78  $$25 :
+  78  $$29 :
 
-  79  $$26 :
+  79  $$30 :
 
-  80  $$27 :
+  80  $$31 :
 
-  81  $$28 :
+  81  for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31
 
-  82  $$29 :
+  82  proc_call_statement : proc_call_name
+  83                      | proc_call_name LPAREN arg_list RPAREN
 
-  83  $$30 :
+  84  proc_call_name : IDENT
 
-  84  $$31 :
+  85  block_statement : SBEGIN statement_list SEND
 
-  85  for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31
+  86  read_statement : READ LPAREN variable RPAREN
 
-  86  proc_call_statement : proc_call_name
-  87                      | proc_call_name LPAREN arg_list RPAREN
+  87  write_statement : WRITE LPAREN expression RPAREN
 
-  88  proc_call_name : IDENT
+  88  null_statement :
 
-  89  block_statement : SBEGIN statement_list SEND
+  89  condition : expression EQ expression
+  90            | expression NEQ expression
+  91            | expression LT expression
+  92            | expression LE expression
+  93            | expression GT expression
+  94            | expression GE expression
 
-  90  read_statement : READ LPAREN variable RPAREN
+  95  expression : term
+  96             | PLUS term
 
-  91  write_statement : WRITE LPAREN expression RPAREN
+  97  $$32 :
 
-  92  null_statement :
+  98  expression : MINUS $$32 term
+  99             | expression PLUS term
+ 100             | expression MINUS term
 
-  93  condition : expression EQ expression
-  94            | expression NEQ expression
-  95            | expression LT expression
-  96            | expression LE expression
-  97            | expression GT expression
-  98            | expression GE expression
+ 101  term : factor
+ 102       | term MULT factor
+ 103       | term DIV factor
 
-  99  expression : term
- 100             | PLUS term
+ 104  factor : variable
+ 105         | NUMBER
+ 106         | LPAREN expression RPAREN
+ 107         | func_call
 
- 101  $$32 :
+ 108  func_call : func_call_name LPAREN arg_list RPAREN
 
- 102  expression : MINUS $$32 term
- 103             | expression PLUS term
- 104             | expression MINUS term
+ 109  func_call_name : IDENT
 
- 105  term : factor
- 106       | term MULT factor
- 107       | term DIV factor
+ 110  arg_list : expression
+ 111           | arg_list COMMA expression
 
- 108  factor : variable
- 109         | NUMBER
- 110         | LPAREN expression RPAREN
- 111         | func_call
+ 112  id_list : var_id
+ 113          | id_list COMMA var_id
 
- 112  func_call : func_call_name LPAREN arg_list RPAREN
+ 114  var_id : id_var
+ 115         | id_array
 
- 113  func_call_name : IDENT
+ 116  id_var : IDENT
 
- 114  arg_list : expression
- 115           | arg_list COMMA expression
-
- 116  id_list : var_id
- 117          | id_list COMMA var_id
-
- 118  var_id : id_var
- 119         | id_array
-
- 120  id_var : IDENT
-
- 121  id_array : IDENT LBRACKET NUMBER INTERVAL NUMBER RBRACKET
+ 117  id_array : IDENT LBRACKET NUMBER INTERVAL NUMBER RBRACKET
 
 state 0
 	$accept : . program $end  (0)
@@ -324,39 +316,39 @@ state 10
 
 
 state 11
-	id_var : IDENT .  (120)
-	id_array : IDENT . LBRACKET NUMBER INTERVAL NUMBER RBRACKET  (121)
+	id_var : IDENT .  (116)
+	id_array : IDENT . LBRACKET NUMBER INTERVAL NUMBER RBRACKET  (117)
 
 	LBRACKET  shift 22
-	RPAREN  reduce 120
-	COMMA  reduce 120
-	SEMICOLON  reduce 120
+	RPAREN  reduce 116
+	COMMA  reduce 116
+	SEMICOLON  reduce 116
 
 
 state 12
 	var_decl : VAR id_list .  (8)
-	id_list : id_list . COMMA var_id  (117)
+	id_list : id_list . COMMA var_id  (113)
 
 	COMMA  shift 23
 	SEMICOLON  reduce 8
 
 
 state 13
-	id_list : var_id .  (116)
+	id_list : var_id .  (112)
 
-	.  reduce 116
+	.  reduce 112
 
 
 state 14
-	var_id : id_var .  (118)
+	var_id : id_var .  (114)
 
-	.  reduce 118
+	.  reduce 114
 
 
 state 15
-	var_id : id_array .  (119)
+	var_id : id_array .  (115)
 
-	.  reduce 119
+	.  reduce 115
 
 
 state 16
@@ -432,14 +424,14 @@ state 21
 
 
 state 22
-	id_array : IDENT LBRACKET . NUMBER INTERVAL NUMBER RBRACKET  (121)
+	id_array : IDENT LBRACKET . NUMBER INTERVAL NUMBER RBRACKET  (117)
 
 	NUMBER  shift 35
 	.  error
 
 
 state 23
-	id_list : id_list COMMA . var_id  (117)
+	id_list : id_list COMMA . var_id  (113)
 
 	IDENT  shift 11
 	.  error
@@ -487,7 +479,7 @@ state 28
 	outblock : var_decl_part forward_decl_part subprog_decl_part . statement  (3)
 	$$9 : .  (42)
 	$$10 : .  (44)
-	null_statement : .  (92)
+	null_statement : .  (88)
 
 	SBEGIN  shift 43
 	FOR  shift 44
@@ -496,32 +488,28 @@ state 28
 	IDENT  shift 47
 	IF  reduce 42
 	WHILE  reduce 44
-	PERIOD  reduce 92
+	PERIOD  reduce 88
 
-	statement  goto 48
-	assignment_statement  goto 49
-	$$9  goto 50
-	$$10  goto 51
-	for_statement  goto 52
-	proc_call_statement  goto 53
-	null_statement  goto 54
-	block_statement  goto 55
-	read_statement  goto 56
-	write_statement  goto 57
-	variable  goto 58
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	proc_call_name  goto 64
+	variable  goto 48
+	statement  goto 49
+	assignment_statement  goto 50
+	$$9  goto 51
+	$$10  goto 52
+	for_statement  goto 53
+	proc_call_statement  goto 54
+	null_statement  goto 55
+	block_statement  goto 56
+	read_statement  goto 57
+	write_statement  goto 58
+	indexed_variable  goto 59
+	proc_call_name  goto 60
 
 
 state 29
 	subprog_decl_part : subprog_decl_list . SEMICOLON  (22)
 	subprog_decl_list : subprog_decl_list . SEMICOLON subprog_decl  (23)
 
-	SEMICOLON  shift 65
+	SEMICOLON  shift 61
 	.  error
 
 
@@ -559,7 +547,7 @@ state 33
 	PERIOD  reduce 10
 	IDENT  reduce 10
 
-	forward_decl  goto 66
+	forward_decl  goto 62
 
 
 state 34
@@ -569,16 +557,16 @@ state 34
 
 
 state 35
-	id_array : IDENT LBRACKET NUMBER . INTERVAL NUMBER RBRACKET  (121)
+	id_array : IDENT LBRACKET NUMBER . INTERVAL NUMBER RBRACKET  (117)
 
-	INTERVAL  shift 67
+	INTERVAL  shift 63
 	.  error
 
 
 state 36
-	id_list : id_list COMMA var_id .  (117)
+	id_list : id_list COMMA var_id .  (113)
 
-	.  reduce 117
+	.  reduce 113
 
 
 state 37
@@ -587,7 +575,7 @@ state 37
 
 	.  reduce 15
 
-	$$3  goto 68
+	$$3  goto 64
 
 
 state 38
@@ -596,7 +584,7 @@ state 38
 
 	.  reduce 13
 
-	$$2  goto 69
+	$$2  goto 65
 
 
 state 39
@@ -609,8 +597,8 @@ state 40
 	func_decl : FUNCTION func_name . SEMICOLON inblock  (32)
 	func_decl : FUNCTION func_name . LPAREN $$6 id_list $$7 RPAREN SEMICOLON inblock  (35)
 
-	LPAREN  shift 70
-	SEMICOLON  shift 71
+	LPAREN  shift 66
+	SEMICOLON  shift 67
 	.  error
 
 
@@ -624,198 +612,170 @@ state 42
 	proc_decl : PROCEDURE proc_name . SEMICOLON inblock  (27)
 	proc_decl : PROCEDURE proc_name . LPAREN $$4 id_list $$5 RPAREN SEMICOLON inblock  (30)
 
-	LPAREN  shift 72
-	SEMICOLON  shift 73
+	LPAREN  shift 68
+	SEMICOLON  shift 69
 	.  error
 
 
 state 43
-	block_statement : SBEGIN . statement_list SEND  (89)
+	block_statement : SBEGIN . statement_list SEND  (85)
 	$$9 : .  (42)
 	$$10 : .  (44)
-	null_statement : .  (92)
+	null_statement : .  (88)
 
 	SBEGIN  shift 43
 	FOR  shift 44
 	READ  shift 45
 	WRITE  shift 46
 	IDENT  shift 47
-	SEND  reduce 92
+	SEND  reduce 88
 	IF  reduce 42
 	WHILE  reduce 44
-	SEMICOLON  reduce 92
+	SEMICOLON  reduce 88
 
-	statement  goto 74
-	statement_list  goto 75
-	assignment_statement  goto 49
-	$$9  goto 50
-	$$10  goto 51
-	for_statement  goto 52
-	proc_call_statement  goto 53
-	null_statement  goto 54
-	block_statement  goto 55
-	read_statement  goto 56
-	write_statement  goto 57
-	variable  goto 58
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	proc_call_name  goto 64
+	variable  goto 48
+	statement  goto 70
+	statement_list  goto 71
+	assignment_statement  goto 50
+	$$9  goto 51
+	$$10  goto 52
+	for_statement  goto 53
+	proc_call_statement  goto 54
+	null_statement  goto 55
+	block_statement  goto 56
+	read_statement  goto 57
+	write_statement  goto 58
+	indexed_variable  goto 59
+	proc_call_name  goto 60
 
 
 state 44
-	for_statement : FOR . IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (85)
+	for_statement : FOR . IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (81)
 
-	IDENT  shift 76
+	IDENT  shift 72
 	.  error
 
 
 state 45
-	read_statement : READ . LPAREN variable RPAREN  (90)
+	read_statement : READ . LPAREN variable RPAREN  (86)
 
-	LPAREN  shift 77
+	LPAREN  shift 73
 	.  error
 
 
 state 46
-	write_statement : WRITE . LPAREN expression RPAREN  (91)
+	write_statement : WRITE . LPAREN expression RPAREN  (87)
 
-	LPAREN  shift 78
+	LPAREN  shift 74
 	.  error
 
 
 state 47
-	variable_id : IDENT .  (56)
-	proc_call_name : IDENT .  (88)
+	variable : IDENT .  (53)
+	proc_call_name : IDENT .  (84)
 
-	ELSE  reduce 88
-	SEND  reduce 88
-	LPAREN  reduce 88
-	LBRACKET  reduce 56
-	SEMICOLON  reduce 88
-	PERIOD  reduce 88
-	ASSIGN  reduce 56
+	ELSE  reduce 84
+	SEND  reduce 84
+	LPAREN  reduce 84
+	LBRACKET  reduce 53
+	SEMICOLON  reduce 84
+	PERIOD  reduce 84
+	ASSIGN  reduce 53
 
 
 state 48
+	assignment_statement : variable . ASSIGN expression  (52)
+	indexed_variable : variable . LBRACKET expression $$11 RBRACKET  (56)
+
+	LBRACKET  shift 75
+	ASSIGN  shift 76
+	.  error
+
+
+state 49
 	outblock : var_decl_part forward_decl_part subprog_decl_part statement .  (3)
 
 	.  reduce 3
 
 
-state 49
+state 50
 	statement : assignment_statement .  (41)
 
 	.  reduce 41
 
 
-state 50
+state 51
 	statement : $$9 . if_statement  (43)
 
-	IF  shift 79
+	IF  shift 77
 	.  error
 
-	if_statement  goto 80
-
-
-state 51
-	statement : $$10 . while_statement  (45)
-
-	WHILE  shift 81
-	.  error
-
-	while_statement  goto 82
+	if_statement  goto 78
 
 
 state 52
+	statement : $$10 . while_statement  (45)
+
+	WHILE  shift 79
+	.  error
+
+	while_statement  goto 80
+
+
+state 53
 	statement : for_statement .  (46)
 
 	.  reduce 46
 
 
-state 53
+state 54
 	statement : proc_call_statement .  (47)
 
 	.  reduce 47
 
 
-state 54
+state 55
 	statement : null_statement .  (48)
 
 	.  reduce 48
 
 
-state 55
+state 56
 	statement : block_statement .  (49)
 
 	.  reduce 49
 
 
-state 56
+state 57
 	statement : read_statement .  (50)
 
 	.  reduce 50
 
 
-state 57
+state 58
 	statement : write_statement .  (51)
 
 	.  reduce 51
 
 
-state 58
-	assignment_statement : variable . ASSIGN expression  (52)
-	array_variable : variable .  (60)
-
-	ASSIGN  shift 83
-	LBRACKET  reduce 60
-
-
 state 59
-	variable : entire_variable .  (53)
-
-	.  reduce 53
-
-
-state 60
-	variable : component_variable .  (54)
+	variable : indexed_variable .  (54)
 
 	.  reduce 54
 
 
+state 60
+	proc_call_statement : proc_call_name .  (82)
+	proc_call_statement : proc_call_name . LPAREN arg_list RPAREN  (83)
+
+	LPAREN  shift 81
+	ELSE  reduce 82
+	SEND  reduce 82
+	SEMICOLON  reduce 82
+	PERIOD  reduce 82
+
+
 state 61
-	entire_variable : variable_id .  (55)
-
-	.  reduce 55
-
-
-state 62
-	component_variable : indexed_variable .  (57)
-
-	.  reduce 57
-
-
-state 63
-	indexed_variable : array_variable . LBRACKET expression $$11 RBRACKET  (59)
-
-	LBRACKET  shift 84
-	.  error
-
-
-state 64
-	proc_call_statement : proc_call_name .  (86)
-	proc_call_statement : proc_call_name . LPAREN arg_list RPAREN  (87)
-
-	LPAREN  shift 85
-	ELSE  reduce 86
-	SEND  reduce 86
-	SEMICOLON  reduce 86
-	PERIOD  reduce 86
-
-
-state 65
 	subprog_decl_part : subprog_decl_list SEMICOLON .  (22)
 	subprog_decl_list : subprog_decl_list SEMICOLON . subprog_decl  (23)
 
@@ -830,54 +790,54 @@ state 65
 	PERIOD  reduce 22
 	IDENT  reduce 22
 
-	subprog_decl  goto 86
+	subprog_decl  goto 82
 	proc_decl  goto 31
 	func_decl  goto 32
 
 
-state 66
+state 62
 	forward_decl_list : forward_decl_list SEMICOLON forward_decl .  (11)
 
 	.  reduce 11
 
 
-state 67
-	id_array : IDENT LBRACKET NUMBER INTERVAL . NUMBER RBRACKET  (121)
+state 63
+	id_array : IDENT LBRACKET NUMBER INTERVAL . NUMBER RBRACKET  (117)
 
-	NUMBER  shift 87
+	NUMBER  shift 83
 	.  error
 
 
-state 68
+state 64
 	forward_decl : FORWARD FUNCTION IDENT $$3 . forward_arg_list  (16)
 	forward_arg_list : .  (17)
 
-	LPAREN  shift 88
+	LPAREN  shift 84
 	SEMICOLON  reduce 17
 
-	forward_arg_list  goto 89
+	forward_arg_list  goto 85
 
 
-state 69
+state 65
 	forward_decl : FORWARD PROCEDURE IDENT $$2 . forward_arg_list  (14)
 	forward_arg_list : .  (17)
 
-	LPAREN  shift 88
+	LPAREN  shift 84
 	SEMICOLON  reduce 17
 
-	forward_arg_list  goto 90
+	forward_arg_list  goto 86
 
 
-state 70
+state 66
 	func_decl : FUNCTION func_name LPAREN . $$6 id_list $$7 RPAREN SEMICOLON inblock  (35)
 	$$6 : .  (33)
 
 	.  reduce 33
 
-	$$6  goto 91
+	$$6  goto 87
 
 
-state 71
+state 67
 	func_decl : FUNCTION func_name SEMICOLON . inblock  (32)
 	var_decl_part : .  (4)
 
@@ -891,22 +851,22 @@ state 71
 	SEMICOLON  reduce 4
 	IDENT  reduce 4
 
-	var_decl_part  goto 92
+	var_decl_part  goto 88
 	var_decl_list  goto 9
 	var_decl  goto 10
-	inblock  goto 93
+	inblock  goto 89
 
 
-state 72
+state 68
 	proc_decl : PROCEDURE proc_name LPAREN . $$4 id_list $$5 RPAREN SEMICOLON inblock  (30)
 	$$4 : .  (28)
 
 	.  reduce 28
 
-	$$4  goto 94
+	$$4  goto 90
 
 
-state 73
+state 69
 	proc_decl : PROCEDURE proc_name SEMICOLON . inblock  (27)
 	var_decl_part : .  (4)
 
@@ -920,460 +880,1054 @@ state 73
 	SEMICOLON  reduce 4
 	IDENT  reduce 4
 
-	var_decl_part  goto 92
+	var_decl_part  goto 88
 	var_decl_list  goto 9
 	var_decl  goto 10
-	inblock  goto 95
+	inblock  goto 91
 
 
-state 74
+state 70
 	statement_list : statement .  (40)
 
 	.  reduce 40
 
 
-state 75
+state 71
 	statement_list : statement_list . SEMICOLON statement  (39)
-	block_statement : SBEGIN statement_list . SEND  (89)
+	block_statement : SBEGIN statement_list . SEND  (85)
 
-	SEND  shift 96
-	SEMICOLON  shift 97
+	SEND  shift 92
+	SEMICOLON  shift 93
 	.  error
+
+
+state 72
+	for_statement : FOR IDENT . $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (81)
+	$$19 : .  (68)
+
+	.  reduce 68
+
+	$$19  goto 94
+
+
+state 73
+	read_statement : READ LPAREN . variable RPAREN  (86)
+
+	IDENT  shift 95
+	.  error
+
+	variable  goto 96
+	indexed_variable  goto 59
+
+
+state 74
+	write_statement : WRITE LPAREN . expression RPAREN  (87)
+
+	PLUS  shift 97
+	MINUS  shift 98
+	LPAREN  shift 99
+	NUMBER  shift 100
+	IDENT  shift 101
+	.  error
+
+	variable  goto 102
+	expression  goto 103
+	indexed_variable  goto 59
+	term  goto 104
+	factor  goto 105
+	func_call  goto 106
+	func_call_name  goto 107
+
+
+state 75
+	indexed_variable : variable LBRACKET . expression $$11 RBRACKET  (56)
+
+	PLUS  shift 97
+	MINUS  shift 98
+	LPAREN  shift 99
+	NUMBER  shift 100
+	IDENT  shift 101
+	.  error
+
+	variable  goto 102
+	expression  goto 108
+	indexed_variable  goto 59
+	term  goto 104
+	factor  goto 105
+	func_call  goto 106
+	func_call_name  goto 107
 
 
 state 76
-	for_statement : FOR IDENT . $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (85)
-	$$19 : .  (72)
+	assignment_statement : variable ASSIGN . expression  (52)
 
-	.  reduce 72
+	PLUS  shift 97
+	MINUS  shift 98
+	LPAREN  shift 99
+	NUMBER  shift 100
+	IDENT  shift 101
+	.  error
 
-	$$19  goto 98
+	variable  goto 102
+	expression  goto 109
+	indexed_variable  goto 59
+	term  goto 104
+	factor  goto 105
+	func_call  goto 106
+	func_call_name  goto 107
 
 
 state 77
-	read_statement : READ LPAREN . variable RPAREN  (90)
+	if_statement : IF . condition $$12 THEN $$13 statement $$14 else_statement  (60)
 
-	IDENT  shift 99
+	PLUS  shift 97
+	MINUS  shift 98
+	LPAREN  shift 99
+	NUMBER  shift 100
+	IDENT  shift 101
 	.  error
 
-	variable  goto 100
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
+	variable  goto 102
+	expression  goto 110
+	indexed_variable  goto 59
+	condition  goto 111
+	term  goto 104
+	factor  goto 105
+	func_call  goto 106
+	func_call_name  goto 107
 
 
 state 78
-	write_statement : WRITE LPAREN . expression RPAREN  (91)
-
-	PLUS  shift 101
-	MINUS  shift 102
-	LPAREN  shift 103
-	NUMBER  shift 104
-	IDENT  shift 105
-	.  error
-
-	variable  goto 106
-	expression  goto 107
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	term  goto 108
-	factor  goto 109
-	func_call  goto 110
-	func_call_name  goto 111
-
-
-state 79
-	if_statement : IF . condition $$12 THEN $$13 statement $$14 else_statement  (64)
-
-	PLUS  shift 101
-	MINUS  shift 102
-	LPAREN  shift 103
-	NUMBER  shift 104
-	IDENT  shift 105
-	.  error
-
-	variable  goto 106
-	expression  goto 112
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	condition  goto 113
-	term  goto 108
-	factor  goto 109
-	func_call  goto 110
-	func_call_name  goto 111
-
-
-state 80
 	statement : $$9 if_statement .  (43)
 
 	.  reduce 43
 
 
-state 81
-	while_statement : WHILE . $$16 condition $$17 DO $$18 statement  (71)
-	$$16 : .  (68)
+state 79
+	while_statement : WHILE . $$16 condition $$17 DO $$18 statement  (67)
+	$$16 : .  (64)
 
-	.  reduce 68
+	.  reduce 64
 
-	$$16  goto 114
+	$$16  goto 112
 
 
-state 82
+state 80
 	statement : $$10 while_statement .  (45)
 
 	.  reduce 45
 
 
-state 83
-	assignment_statement : variable ASSIGN . expression  (52)
+state 81
+	proc_call_statement : proc_call_name LPAREN . arg_list RPAREN  (83)
 
-	PLUS  shift 101
-	MINUS  shift 102
-	LPAREN  shift 103
-	NUMBER  shift 104
-	IDENT  shift 105
+	PLUS  shift 97
+	MINUS  shift 98
+	LPAREN  shift 99
+	NUMBER  shift 100
+	IDENT  shift 101
 	.  error
 
-	variable  goto 106
-	expression  goto 115
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	term  goto 108
-	factor  goto 109
-	func_call  goto 110
-	func_call_name  goto 111
+	variable  goto 102
+	expression  goto 113
+	indexed_variable  goto 59
+	arg_list  goto 114
+	term  goto 104
+	factor  goto 105
+	func_call  goto 106
+	func_call_name  goto 107
 
 
-state 84
-	indexed_variable : array_variable LBRACKET . expression $$11 RBRACKET  (59)
-
-	PLUS  shift 101
-	MINUS  shift 102
-	LPAREN  shift 103
-	NUMBER  shift 104
-	IDENT  shift 105
-	.  error
-
-	variable  goto 106
-	expression  goto 116
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	term  goto 108
-	factor  goto 109
-	func_call  goto 110
-	func_call_name  goto 111
-
-
-state 85
-	proc_call_statement : proc_call_name LPAREN . arg_list RPAREN  (87)
-
-	PLUS  shift 101
-	MINUS  shift 102
-	LPAREN  shift 103
-	NUMBER  shift 104
-	IDENT  shift 105
-	.  error
-
-	variable  goto 106
-	expression  goto 117
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	arg_list  goto 118
-	term  goto 108
-	factor  goto 109
-	func_call  goto 110
-	func_call_name  goto 111
-
-
-state 86
+state 82
 	subprog_decl_list : subprog_decl_list SEMICOLON subprog_decl .  (23)
 
 	.  reduce 23
 
 
-state 87
-	id_array : IDENT LBRACKET NUMBER INTERVAL NUMBER . RBRACKET  (121)
+state 83
+	id_array : IDENT LBRACKET NUMBER INTERVAL NUMBER . RBRACKET  (117)
 
-	RBRACKET  shift 119
+	RBRACKET  shift 115
 	.  error
 
 
-state 88
+state 84
 	forward_arg_list : LPAREN . forward_arg RPAREN  (18)
 
-	IDENT  shift 120
+	IDENT  shift 116
 	.  error
 
-	forward_arg  goto 121
+	forward_arg  goto 117
 
 
-state 89
+state 85
 	forward_decl : FORWARD FUNCTION IDENT $$3 forward_arg_list .  (16)
 
 	.  reduce 16
 
 
-state 90
+state 86
 	forward_decl : FORWARD PROCEDURE IDENT $$2 forward_arg_list .  (14)
 
 	.  reduce 14
 
 
-state 91
+state 87
 	func_decl : FUNCTION func_name LPAREN $$6 . id_list $$7 RPAREN SEMICOLON inblock  (35)
 
 	IDENT  shift 11
 	.  error
 
-	id_list  goto 122
+	id_list  goto 118
 	var_id  goto 13
 	id_var  goto 14
 	id_array  goto 15
 
 
-state 92
+state 88
 	inblock : var_decl_part . $$8 statement  (38)
 	$$8 : .  (37)
 
 	.  reduce 37
 
-	$$8  goto 123
+	$$8  goto 119
 
 
-state 93
+state 89
 	func_decl : FUNCTION func_name SEMICOLON inblock .  (32)
 
 	.  reduce 32
 
 
-state 94
+state 90
 	proc_decl : PROCEDURE proc_name LPAREN $$4 . id_list $$5 RPAREN SEMICOLON inblock  (30)
 
 	IDENT  shift 11
 	.  error
 
-	id_list  goto 124
+	id_list  goto 120
 	var_id  goto 13
 	id_var  goto 14
 	id_array  goto 15
 
 
-state 95
+state 91
 	proc_decl : PROCEDURE proc_name SEMICOLON inblock .  (27)
 
 	.  reduce 27
 
 
-state 96
-	block_statement : SBEGIN statement_list SEND .  (89)
+state 92
+	block_statement : SBEGIN statement_list SEND .  (85)
 
-	.  reduce 89
+	.  reduce 85
 
 
-state 97
+state 93
 	statement_list : statement_list SEMICOLON . statement  (39)
 	$$9 : .  (42)
 	$$10 : .  (44)
-	null_statement : .  (92)
+	null_statement : .  (88)
 
 	SBEGIN  shift 43
 	FOR  shift 44
 	READ  shift 45
 	WRITE  shift 46
 	IDENT  shift 47
-	SEND  reduce 92
+	SEND  reduce 88
 	IF  reduce 42
 	WHILE  reduce 44
-	SEMICOLON  reduce 92
+	SEMICOLON  reduce 88
 
-	statement  goto 125
-	assignment_statement  goto 49
-	$$9  goto 50
-	$$10  goto 51
-	for_statement  goto 52
-	proc_call_statement  goto 53
-	null_statement  goto 54
-	block_statement  goto 55
-	read_statement  goto 56
-	write_statement  goto 57
-	variable  goto 58
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	proc_call_name  goto 64
+	variable  goto 48
+	statement  goto 121
+	assignment_statement  goto 50
+	$$9  goto 51
+	$$10  goto 52
+	for_statement  goto 53
+	proc_call_statement  goto 54
+	null_statement  goto 55
+	block_statement  goto 56
+	read_statement  goto 57
+	write_statement  goto 58
+	indexed_variable  goto 59
+	proc_call_name  goto 60
+
+
+state 94
+	for_statement : FOR IDENT $$19 . ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (81)
+
+	ASSIGN  shift 122
+	.  error
+
+
+state 95
+	variable : IDENT .  (53)
+
+	.  reduce 53
+
+
+state 96
+	indexed_variable : variable . LBRACKET expression $$11 RBRACKET  (56)
+	read_statement : READ LPAREN variable . RPAREN  (86)
+
+	RPAREN  shift 123
+	LBRACKET  shift 75
+	.  error
+
+
+state 97
+	expression : PLUS . term  (96)
+
+	LPAREN  shift 99
+	NUMBER  shift 100
+	IDENT  shift 101
+	.  error
+
+	variable  goto 102
+	indexed_variable  goto 59
+	term  goto 124
+	factor  goto 105
+	func_call  goto 106
+	func_call_name  goto 107
 
 
 state 98
-	for_statement : FOR IDENT $$19 . ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (85)
+	expression : MINUS . $$32 term  (98)
+	$$32 : .  (97)
 
-	ASSIGN  shift 126
-	.  error
+	.  reduce 97
+
+	$$32  goto 125
 
 
 state 99
-	variable_id : IDENT .  (56)
+	factor : LPAREN . expression RPAREN  (106)
 
-	.  reduce 56
+	PLUS  shift 97
+	MINUS  shift 98
+	LPAREN  shift 99
+	NUMBER  shift 100
+	IDENT  shift 101
+	.  error
+
+	variable  goto 102
+	expression  goto 126
+	indexed_variable  goto 59
+	term  goto 104
+	factor  goto 105
+	func_call  goto 106
+	func_call_name  goto 107
 
 
 state 100
-	array_variable : variable .  (60)
-	read_statement : READ LPAREN variable . RPAREN  (90)
+	factor : NUMBER .  (105)
 
-	RPAREN  shift 127
-	LBRACKET  reduce 60
+	.  reduce 105
 
 
 state 101
-	expression : PLUS . term  (100)
+	variable : IDENT .  (53)
+	func_call_name : IDENT .  (109)
 
-	LPAREN  shift 103
-	NUMBER  shift 104
-	IDENT  shift 105
-	.  error
-
-	variable  goto 106
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	term  goto 128
-	factor  goto 109
-	func_call  goto 110
-	func_call_name  goto 111
+	DO  reduce 53
+	ELSE  reduce 53
+	SEND  reduce 53
+	THEN  reduce 53
+	TO  reduce 53
+	PLUS  reduce 53
+	MINUS  reduce 53
+	MULT  reduce 53
+	DIV  reduce 53
+	EQ  reduce 53
+	NEQ  reduce 53
+	LE  reduce 53
+	LT  reduce 53
+	GE  reduce 53
+	GT  reduce 53
+	LPAREN  reduce 109
+	RPAREN  reduce 53
+	LBRACKET  reduce 53
+	RBRACKET  reduce 53
+	COMMA  reduce 53
+	SEMICOLON  reduce 53
+	PERIOD  reduce 53
 
 
 state 102
-	expression : MINUS . $$32 term  (102)
-	$$32 : .  (101)
+	indexed_variable : variable . LBRACKET expression $$11 RBRACKET  (56)
+	factor : variable .  (104)
 
-	.  reduce 101
-
-	$$32  goto 129
+	LBRACKET  shift 75
+	DO  reduce 104
+	ELSE  reduce 104
+	SEND  reduce 104
+	THEN  reduce 104
+	TO  reduce 104
+	PLUS  reduce 104
+	MINUS  reduce 104
+	MULT  reduce 104
+	DIV  reduce 104
+	EQ  reduce 104
+	NEQ  reduce 104
+	LE  reduce 104
+	LT  reduce 104
+	GE  reduce 104
+	GT  reduce 104
+	RPAREN  reduce 104
+	RBRACKET  reduce 104
+	COMMA  reduce 104
+	SEMICOLON  reduce 104
+	PERIOD  reduce 104
 
 
 state 103
-	factor : LPAREN . expression RPAREN  (110)
+	write_statement : WRITE LPAREN expression . RPAREN  (87)
+	expression : expression . PLUS term  (99)
+	expression : expression . MINUS term  (100)
 
-	PLUS  shift 101
-	MINUS  shift 102
-	LPAREN  shift 103
-	NUMBER  shift 104
-	IDENT  shift 105
+	PLUS  shift 127
+	MINUS  shift 128
+	RPAREN  shift 129
 	.  error
-
-	variable  goto 106
-	expression  goto 130
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	term  goto 108
-	factor  goto 109
-	func_call  goto 110
-	func_call_name  goto 111
 
 
 state 104
-	factor : NUMBER .  (109)
+	expression : term .  (95)
+	term : term . MULT factor  (102)
+	term : term . DIV factor  (103)
 
-	.  reduce 109
+	MULT  shift 130
+	DIV  shift 131
+	DO  reduce 95
+	ELSE  reduce 95
+	SEND  reduce 95
+	THEN  reduce 95
+	TO  reduce 95
+	PLUS  reduce 95
+	MINUS  reduce 95
+	EQ  reduce 95
+	NEQ  reduce 95
+	LE  reduce 95
+	LT  reduce 95
+	GE  reduce 95
+	GT  reduce 95
+	RPAREN  reduce 95
+	RBRACKET  reduce 95
+	COMMA  reduce 95
+	SEMICOLON  reduce 95
+	PERIOD  reduce 95
 
 
 state 105
-	variable_id : IDENT .  (56)
-	func_call_name : IDENT .  (113)
+	term : factor .  (101)
 
-	DO  reduce 56
-	ELSE  reduce 56
-	SEND  reduce 56
-	THEN  reduce 56
-	TO  reduce 56
-	PLUS  reduce 56
-	MINUS  reduce 56
-	MULT  reduce 56
-	DIV  reduce 56
-	EQ  reduce 56
-	NEQ  reduce 56
-	LE  reduce 56
-	LT  reduce 56
-	GE  reduce 56
-	GT  reduce 56
-	LPAREN  reduce 113
-	RPAREN  reduce 56
-	LBRACKET  reduce 56
-	RBRACKET  reduce 56
-	COMMA  reduce 56
-	SEMICOLON  reduce 56
-	PERIOD  reduce 56
+	.  reduce 101
 
 
 state 106
-	array_variable : variable .  (60)
-	factor : variable .  (108)
+	factor : func_call .  (107)
 
-	DO  reduce 108
-	ELSE  reduce 108
-	SEND  reduce 108
-	THEN  reduce 108
-	TO  reduce 108
-	PLUS  reduce 108
-	MINUS  reduce 108
-	MULT  reduce 108
-	DIV  reduce 108
-	EQ  reduce 108
-	NEQ  reduce 108
-	LE  reduce 108
-	LT  reduce 108
-	GE  reduce 108
-	GT  reduce 108
-	RPAREN  reduce 108
-	LBRACKET  reduce 60
-	RBRACKET  reduce 108
-	COMMA  reduce 108
-	SEMICOLON  reduce 108
-	PERIOD  reduce 108
+	.  reduce 107
 
 
 state 107
-	write_statement : WRITE LPAREN expression . RPAREN  (91)
-	expression : expression . PLUS term  (103)
-	expression : expression . MINUS term  (104)
+	func_call : func_call_name . LPAREN arg_list RPAREN  (108)
 
-	PLUS  shift 131
-	MINUS  shift 132
-	RPAREN  shift 133
+	LPAREN  shift 132
 	.  error
 
 
 state 108
-	expression : term .  (99)
-	term : term . MULT factor  (106)
-	term : term . DIV factor  (107)
+	indexed_variable : variable LBRACKET expression . $$11 RBRACKET  (56)
+	expression : expression . PLUS term  (99)
+	expression : expression . MINUS term  (100)
+	$$11 : .  (55)
 
-	MULT  shift 134
-	DIV  shift 135
+	PLUS  shift 127
+	MINUS  shift 128
+	RBRACKET  reduce 55
+
+	$$11  goto 133
+
+
+state 109
+	assignment_statement : variable ASSIGN expression .  (52)
+	expression : expression . PLUS term  (99)
+	expression : expression . MINUS term  (100)
+
+	PLUS  shift 127
+	MINUS  shift 128
+	ELSE  reduce 52
+	SEND  reduce 52
+	SEMICOLON  reduce 52
+	PERIOD  reduce 52
+
+
+state 110
+	condition : expression . EQ expression  (89)
+	condition : expression . NEQ expression  (90)
+	condition : expression . LT expression  (91)
+	condition : expression . LE expression  (92)
+	condition : expression . GT expression  (93)
+	condition : expression . GE expression  (94)
+	expression : expression . PLUS term  (99)
+	expression : expression . MINUS term  (100)
+
+	PLUS  shift 127
+	MINUS  shift 128
+	EQ  shift 134
+	NEQ  shift 135
+	LE  shift 136
+	LT  shift 137
+	GE  shift 138
+	GT  shift 139
+	.  error
+
+
+state 111
+	if_statement : IF condition . $$12 THEN $$13 statement $$14 else_statement  (60)
+	$$12 : .  (57)
+
+	.  reduce 57
+
+	$$12  goto 140
+
+
+state 112
+	while_statement : WHILE $$16 . condition $$17 DO $$18 statement  (67)
+
+	PLUS  shift 97
+	MINUS  shift 98
+	LPAREN  shift 99
+	NUMBER  shift 100
+	IDENT  shift 101
+	.  error
+
+	variable  goto 102
+	expression  goto 110
+	indexed_variable  goto 59
+	condition  goto 141
+	term  goto 104
+	factor  goto 105
+	func_call  goto 106
+	func_call_name  goto 107
+
+
+state 113
+	expression : expression . PLUS term  (99)
+	expression : expression . MINUS term  (100)
+	arg_list : expression .  (110)
+
+	PLUS  shift 127
+	MINUS  shift 128
+	RPAREN  reduce 110
+	COMMA  reduce 110
+
+
+state 114
+	proc_call_statement : proc_call_name LPAREN arg_list . RPAREN  (83)
+	arg_list : arg_list . COMMA expression  (111)
+
+	RPAREN  shift 142
+	COMMA  shift 143
+	.  error
+
+
+state 115
+	id_array : IDENT LBRACKET NUMBER INTERVAL NUMBER RBRACKET .  (117)
+
+	.  reduce 117
+
+
+state 116
+	forward_arg : IDENT .  (20)
+
+	.  reduce 20
+
+
+state 117
+	forward_arg_list : LPAREN forward_arg . RPAREN  (18)
+	forward_arg : forward_arg . COMMA IDENT  (19)
+
+	RPAREN  shift 144
+	COMMA  shift 145
+	.  error
+
+
+state 118
+	func_decl : FUNCTION func_name LPAREN $$6 id_list . $$7 RPAREN SEMICOLON inblock  (35)
+	id_list : id_list . COMMA var_id  (113)
+	$$7 : .  (34)
+
+	COMMA  shift 23
+	RPAREN  reduce 34
+
+	$$7  goto 146
+
+
+state 119
+	inblock : var_decl_part $$8 . statement  (38)
+	$$9 : .  (42)
+	$$10 : .  (44)
+	null_statement : .  (88)
+
+	SBEGIN  shift 43
+	FOR  shift 44
+	READ  shift 45
+	WRITE  shift 46
+	IDENT  shift 47
+	IF  reduce 42
+	WHILE  reduce 44
+	SEMICOLON  reduce 88
+
+	variable  goto 48
+	statement  goto 147
+	assignment_statement  goto 50
+	$$9  goto 51
+	$$10  goto 52
+	for_statement  goto 53
+	proc_call_statement  goto 54
+	null_statement  goto 55
+	block_statement  goto 56
+	read_statement  goto 57
+	write_statement  goto 58
+	indexed_variable  goto 59
+	proc_call_name  goto 60
+
+
+state 120
+	proc_decl : PROCEDURE proc_name LPAREN $$4 id_list . $$5 RPAREN SEMICOLON inblock  (30)
+	id_list : id_list . COMMA var_id  (113)
+	$$5 : .  (29)
+
+	COMMA  shift 23
+	RPAREN  reduce 29
+
+	$$5  goto 148
+
+
+state 121
+	statement_list : statement_list SEMICOLON statement .  (39)
+
+	.  reduce 39
+
+
+state 122
+	for_statement : FOR IDENT $$19 ASSIGN . expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (81)
+
+	PLUS  shift 97
+	MINUS  shift 98
+	LPAREN  shift 99
+	NUMBER  shift 100
+	IDENT  shift 101
+	.  error
+
+	variable  goto 102
+	expression  goto 149
+	indexed_variable  goto 59
+	term  goto 104
+	factor  goto 105
+	func_call  goto 106
+	func_call_name  goto 107
+
+
+state 123
+	read_statement : READ LPAREN variable RPAREN .  (86)
+
+	.  reduce 86
+
+
+state 124
+	expression : PLUS term .  (96)
+	term : term . MULT factor  (102)
+	term : term . DIV factor  (103)
+
+	MULT  shift 130
+	DIV  shift 131
+	DO  reduce 96
+	ELSE  reduce 96
+	SEND  reduce 96
+	THEN  reduce 96
+	TO  reduce 96
+	PLUS  reduce 96
+	MINUS  reduce 96
+	EQ  reduce 96
+	NEQ  reduce 96
+	LE  reduce 96
+	LT  reduce 96
+	GE  reduce 96
+	GT  reduce 96
+	RPAREN  reduce 96
+	RBRACKET  reduce 96
+	COMMA  reduce 96
+	SEMICOLON  reduce 96
+	PERIOD  reduce 96
+
+
+state 125
+	expression : MINUS $$32 . term  (98)
+
+	LPAREN  shift 99
+	NUMBER  shift 100
+	IDENT  shift 101
+	.  error
+
+	variable  goto 102
+	indexed_variable  goto 59
+	term  goto 150
+	factor  goto 105
+	func_call  goto 106
+	func_call_name  goto 107
+
+
+state 126
+	expression : expression . PLUS term  (99)
+	expression : expression . MINUS term  (100)
+	factor : LPAREN expression . RPAREN  (106)
+
+	PLUS  shift 127
+	MINUS  shift 128
+	RPAREN  shift 151
+	.  error
+
+
+state 127
+	expression : expression PLUS . term  (99)
+
+	LPAREN  shift 99
+	NUMBER  shift 100
+	IDENT  shift 101
+	.  error
+
+	variable  goto 102
+	indexed_variable  goto 59
+	term  goto 152
+	factor  goto 105
+	func_call  goto 106
+	func_call_name  goto 107
+
+
+state 128
+	expression : expression MINUS . term  (100)
+
+	LPAREN  shift 99
+	NUMBER  shift 100
+	IDENT  shift 101
+	.  error
+
+	variable  goto 102
+	indexed_variable  goto 59
+	term  goto 153
+	factor  goto 105
+	func_call  goto 106
+	func_call_name  goto 107
+
+
+state 129
+	write_statement : WRITE LPAREN expression RPAREN .  (87)
+
+	.  reduce 87
+
+
+state 130
+	term : term MULT . factor  (102)
+
+	LPAREN  shift 99
+	NUMBER  shift 100
+	IDENT  shift 101
+	.  error
+
+	variable  goto 102
+	indexed_variable  goto 59
+	factor  goto 154
+	func_call  goto 106
+	func_call_name  goto 107
+
+
+state 131
+	term : term DIV . factor  (103)
+
+	LPAREN  shift 99
+	NUMBER  shift 100
+	IDENT  shift 101
+	.  error
+
+	variable  goto 102
+	indexed_variable  goto 59
+	factor  goto 155
+	func_call  goto 106
+	func_call_name  goto 107
+
+
+state 132
+	func_call : func_call_name LPAREN . arg_list RPAREN  (108)
+
+	PLUS  shift 97
+	MINUS  shift 98
+	LPAREN  shift 99
+	NUMBER  shift 100
+	IDENT  shift 101
+	.  error
+
+	variable  goto 102
+	expression  goto 113
+	indexed_variable  goto 59
+	arg_list  goto 156
+	term  goto 104
+	factor  goto 105
+	func_call  goto 106
+	func_call_name  goto 107
+
+
+state 133
+	indexed_variable : variable LBRACKET expression $$11 . RBRACKET  (56)
+
+	RBRACKET  shift 157
+	.  error
+
+
+state 134
+	condition : expression EQ . expression  (89)
+
+	PLUS  shift 97
+	MINUS  shift 98
+	LPAREN  shift 99
+	NUMBER  shift 100
+	IDENT  shift 101
+	.  error
+
+	variable  goto 102
+	expression  goto 158
+	indexed_variable  goto 59
+	term  goto 104
+	factor  goto 105
+	func_call  goto 106
+	func_call_name  goto 107
+
+
+state 135
+	condition : expression NEQ . expression  (90)
+
+	PLUS  shift 97
+	MINUS  shift 98
+	LPAREN  shift 99
+	NUMBER  shift 100
+	IDENT  shift 101
+	.  error
+
+	variable  goto 102
+	expression  goto 159
+	indexed_variable  goto 59
+	term  goto 104
+	factor  goto 105
+	func_call  goto 106
+	func_call_name  goto 107
+
+
+state 136
+	condition : expression LE . expression  (92)
+
+	PLUS  shift 97
+	MINUS  shift 98
+	LPAREN  shift 99
+	NUMBER  shift 100
+	IDENT  shift 101
+	.  error
+
+	variable  goto 102
+	expression  goto 160
+	indexed_variable  goto 59
+	term  goto 104
+	factor  goto 105
+	func_call  goto 106
+	func_call_name  goto 107
+
+
+state 137
+	condition : expression LT . expression  (91)
+
+	PLUS  shift 97
+	MINUS  shift 98
+	LPAREN  shift 99
+	NUMBER  shift 100
+	IDENT  shift 101
+	.  error
+
+	variable  goto 102
+	expression  goto 161
+	indexed_variable  goto 59
+	term  goto 104
+	factor  goto 105
+	func_call  goto 106
+	func_call_name  goto 107
+
+
+state 138
+	condition : expression GE . expression  (94)
+
+	PLUS  shift 97
+	MINUS  shift 98
+	LPAREN  shift 99
+	NUMBER  shift 100
+	IDENT  shift 101
+	.  error
+
+	variable  goto 102
+	expression  goto 162
+	indexed_variable  goto 59
+	term  goto 104
+	factor  goto 105
+	func_call  goto 106
+	func_call_name  goto 107
+
+
+state 139
+	condition : expression GT . expression  (93)
+
+	PLUS  shift 97
+	MINUS  shift 98
+	LPAREN  shift 99
+	NUMBER  shift 100
+	IDENT  shift 101
+	.  error
+
+	variable  goto 102
+	expression  goto 163
+	indexed_variable  goto 59
+	term  goto 104
+	factor  goto 105
+	func_call  goto 106
+	func_call_name  goto 107
+
+
+state 140
+	if_statement : IF condition $$12 . THEN $$13 statement $$14 else_statement  (60)
+
+	THEN  shift 164
+	.  error
+
+
+state 141
+	while_statement : WHILE $$16 condition . $$17 DO $$18 statement  (67)
+	$$17 : .  (65)
+
+	.  reduce 65
+
+	$$17  goto 165
+
+
+state 142
+	proc_call_statement : proc_call_name LPAREN arg_list RPAREN .  (83)
+
+	.  reduce 83
+
+
+state 143
+	arg_list : arg_list COMMA . expression  (111)
+
+	PLUS  shift 97
+	MINUS  shift 98
+	LPAREN  shift 99
+	NUMBER  shift 100
+	IDENT  shift 101
+	.  error
+
+	variable  goto 102
+	expression  goto 166
+	indexed_variable  goto 59
+	term  goto 104
+	factor  goto 105
+	func_call  goto 106
+	func_call_name  goto 107
+
+
+state 144
+	forward_arg_list : LPAREN forward_arg RPAREN .  (18)
+
+	.  reduce 18
+
+
+state 145
+	forward_arg : forward_arg COMMA . IDENT  (19)
+
+	IDENT  shift 167
+	.  error
+
+
+state 146
+	func_decl : FUNCTION func_name LPAREN $$6 id_list $$7 . RPAREN SEMICOLON inblock  (35)
+
+	RPAREN  shift 168
+	.  error
+
+
+state 147
+	inblock : var_decl_part $$8 statement .  (38)
+
+	.  reduce 38
+
+
+state 148
+	proc_decl : PROCEDURE proc_name LPAREN $$4 id_list $$5 . RPAREN SEMICOLON inblock  (30)
+
+	RPAREN  shift 169
+	.  error
+
+
+state 149
+	for_statement : FOR IDENT $$19 ASSIGN expression . $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (81)
+	expression : expression . PLUS term  (99)
+	expression : expression . MINUS term  (100)
+	$$20 : .  (69)
+
+	PLUS  shift 127
+	MINUS  shift 128
+	TO  reduce 69
+
+	$$20  goto 170
+
+
+state 150
+	expression : MINUS $$32 term .  (98)
+	term : term . MULT factor  (102)
+	term : term . DIV factor  (103)
+
+	MULT  shift 130
+	DIV  shift 131
+	DO  reduce 98
+	ELSE  reduce 98
+	SEND  reduce 98
+	THEN  reduce 98
+	TO  reduce 98
+	PLUS  reduce 98
+	MINUS  reduce 98
+	EQ  reduce 98
+	NEQ  reduce 98
+	LE  reduce 98
+	LT  reduce 98
+	GE  reduce 98
+	GT  reduce 98
+	RPAREN  reduce 98
+	RBRACKET  reduce 98
+	COMMA  reduce 98
+	SEMICOLON  reduce 98
+	PERIOD  reduce 98
+
+
+state 151
+	factor : LPAREN expression RPAREN .  (106)
+
+	.  reduce 106
+
+
+state 152
+	expression : expression PLUS term .  (99)
+	term : term . MULT factor  (102)
+	term : term . DIV factor  (103)
+
+	MULT  shift 130
+	DIV  shift 131
 	DO  reduce 99
 	ELSE  reduce 99
 	SEND  reduce 99
@@ -1394,244 +1948,13 @@ state 108
 	PERIOD  reduce 99
 
 
-state 109
-	term : factor .  (105)
-
-	.  reduce 105
-
-
-state 110
-	factor : func_call .  (111)
-
-	.  reduce 111
-
-
-state 111
-	func_call : func_call_name . LPAREN arg_list RPAREN  (112)
-
-	LPAREN  shift 136
-	.  error
-
-
-state 112
-	condition : expression . EQ expression  (93)
-	condition : expression . NEQ expression  (94)
-	condition : expression . LT expression  (95)
-	condition : expression . LE expression  (96)
-	condition : expression . GT expression  (97)
-	condition : expression . GE expression  (98)
-	expression : expression . PLUS term  (103)
-	expression : expression . MINUS term  (104)
-
-	PLUS  shift 131
-	MINUS  shift 132
-	EQ  shift 137
-	NEQ  shift 138
-	LE  shift 139
-	LT  shift 140
-	GE  shift 141
-	GT  shift 142
-	.  error
-
-
-state 113
-	if_statement : IF condition . $$12 THEN $$13 statement $$14 else_statement  (64)
-	$$12 : .  (61)
-
-	.  reduce 61
-
-	$$12  goto 143
-
-
-state 114
-	while_statement : WHILE $$16 . condition $$17 DO $$18 statement  (71)
-
-	PLUS  shift 101
-	MINUS  shift 102
-	LPAREN  shift 103
-	NUMBER  shift 104
-	IDENT  shift 105
-	.  error
-
-	variable  goto 106
-	expression  goto 112
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	condition  goto 144
-	term  goto 108
-	factor  goto 109
-	func_call  goto 110
-	func_call_name  goto 111
-
-
-state 115
-	assignment_statement : variable ASSIGN expression .  (52)
-	expression : expression . PLUS term  (103)
-	expression : expression . MINUS term  (104)
-
-	PLUS  shift 131
-	MINUS  shift 132
-	ELSE  reduce 52
-	SEND  reduce 52
-	SEMICOLON  reduce 52
-	PERIOD  reduce 52
-
-
-state 116
-	indexed_variable : array_variable LBRACKET expression . $$11 RBRACKET  (59)
-	expression : expression . PLUS term  (103)
-	expression : expression . MINUS term  (104)
-	$$11 : .  (58)
-
-	PLUS  shift 131
-	MINUS  shift 132
-	RBRACKET  reduce 58
-
-	$$11  goto 145
-
-
-state 117
-	expression : expression . PLUS term  (103)
-	expression : expression . MINUS term  (104)
-	arg_list : expression .  (114)
-
-	PLUS  shift 131
-	MINUS  shift 132
-	RPAREN  reduce 114
-	COMMA  reduce 114
-
-
-state 118
-	proc_call_statement : proc_call_name LPAREN arg_list . RPAREN  (87)
-	arg_list : arg_list . COMMA expression  (115)
-
-	RPAREN  shift 146
-	COMMA  shift 147
-	.  error
-
-
-state 119
-	id_array : IDENT LBRACKET NUMBER INTERVAL NUMBER RBRACKET .  (121)
-
-	.  reduce 121
-
-
-state 120
-	forward_arg : IDENT .  (20)
-
-	.  reduce 20
-
-
-state 121
-	forward_arg_list : LPAREN forward_arg . RPAREN  (18)
-	forward_arg : forward_arg . COMMA IDENT  (19)
-
-	RPAREN  shift 148
-	COMMA  shift 149
-	.  error
-
-
-state 122
-	func_decl : FUNCTION func_name LPAREN $$6 id_list . $$7 RPAREN SEMICOLON inblock  (35)
-	id_list : id_list . COMMA var_id  (117)
-	$$7 : .  (34)
-
-	COMMA  shift 23
-	RPAREN  reduce 34
-
-	$$7  goto 150
-
-
-state 123
-	inblock : var_decl_part $$8 . statement  (38)
-	$$9 : .  (42)
-	$$10 : .  (44)
-	null_statement : .  (92)
-
-	SBEGIN  shift 43
-	FOR  shift 44
-	READ  shift 45
-	WRITE  shift 46
-	IDENT  shift 47
-	IF  reduce 42
-	WHILE  reduce 44
-	SEMICOLON  reduce 92
-
-	statement  goto 151
-	assignment_statement  goto 49
-	$$9  goto 50
-	$$10  goto 51
-	for_statement  goto 52
-	proc_call_statement  goto 53
-	null_statement  goto 54
-	block_statement  goto 55
-	read_statement  goto 56
-	write_statement  goto 57
-	variable  goto 58
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	proc_call_name  goto 64
-
-
-state 124
-	proc_decl : PROCEDURE proc_name LPAREN $$4 id_list . $$5 RPAREN SEMICOLON inblock  (30)
-	id_list : id_list . COMMA var_id  (117)
-	$$5 : .  (29)
-
-	COMMA  shift 23
-	RPAREN  reduce 29
-
-	$$5  goto 152
-
-
-state 125
-	statement_list : statement_list SEMICOLON statement .  (39)
-
-	.  reduce 39
-
-
-state 126
-	for_statement : FOR IDENT $$19 ASSIGN . expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (85)
-
-	PLUS  shift 101
-	MINUS  shift 102
-	LPAREN  shift 103
-	NUMBER  shift 104
-	IDENT  shift 105
-	.  error
-
-	variable  goto 106
-	expression  goto 153
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	term  goto 108
-	factor  goto 109
-	func_call  goto 110
-	func_call_name  goto 111
-
-
-state 127
-	read_statement : READ LPAREN variable RPAREN .  (90)
-
-	.  reduce 90
-
-
-state 128
-	expression : PLUS term .  (100)
-	term : term . MULT factor  (106)
-	term : term . DIV factor  (107)
-
-	MULT  shift 134
-	DIV  shift 135
+state 153
+	expression : expression MINUS term .  (100)
+	term : term . MULT factor  (102)
+	term : term . DIV factor  (103)
+
+	MULT  shift 130
+	DIV  shift 131
 	DO  reduce 100
 	ELSE  reduce 100
 	SEND  reduce 100
@@ -1652,668 +1975,202 @@ state 128
 	PERIOD  reduce 100
 
 
-state 129
-	expression : MINUS $$32 . term  (102)
-
-	LPAREN  shift 103
-	NUMBER  shift 104
-	IDENT  shift 105
-	.  error
-
-	variable  goto 106
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	term  goto 154
-	factor  goto 109
-	func_call  goto 110
-	func_call_name  goto 111
-
-
-state 130
-	expression : expression . PLUS term  (103)
-	expression : expression . MINUS term  (104)
-	factor : LPAREN expression . RPAREN  (110)
-
-	PLUS  shift 131
-	MINUS  shift 132
-	RPAREN  shift 155
-	.  error
-
-
-state 131
-	expression : expression PLUS . term  (103)
-
-	LPAREN  shift 103
-	NUMBER  shift 104
-	IDENT  shift 105
-	.  error
-
-	variable  goto 106
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	term  goto 156
-	factor  goto 109
-	func_call  goto 110
-	func_call_name  goto 111
-
-
-state 132
-	expression : expression MINUS . term  (104)
-
-	LPAREN  shift 103
-	NUMBER  shift 104
-	IDENT  shift 105
-	.  error
-
-	variable  goto 106
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	term  goto 157
-	factor  goto 109
-	func_call  goto 110
-	func_call_name  goto 111
-
-
-state 133
-	write_statement : WRITE LPAREN expression RPAREN .  (91)
-
-	.  reduce 91
-
-
-state 134
-	term : term MULT . factor  (106)
-
-	LPAREN  shift 103
-	NUMBER  shift 104
-	IDENT  shift 105
-	.  error
-
-	variable  goto 106
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	factor  goto 158
-	func_call  goto 110
-	func_call_name  goto 111
-
-
-state 135
-	term : term DIV . factor  (107)
-
-	LPAREN  shift 103
-	NUMBER  shift 104
-	IDENT  shift 105
-	.  error
-
-	variable  goto 106
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	factor  goto 159
-	func_call  goto 110
-	func_call_name  goto 111
-
-
-state 136
-	func_call : func_call_name LPAREN . arg_list RPAREN  (112)
-
-	PLUS  shift 101
-	MINUS  shift 102
-	LPAREN  shift 103
-	NUMBER  shift 104
-	IDENT  shift 105
-	.  error
-
-	variable  goto 106
-	expression  goto 117
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	arg_list  goto 160
-	term  goto 108
-	factor  goto 109
-	func_call  goto 110
-	func_call_name  goto 111
-
-
-state 137
-	condition : expression EQ . expression  (93)
-
-	PLUS  shift 101
-	MINUS  shift 102
-	LPAREN  shift 103
-	NUMBER  shift 104
-	IDENT  shift 105
-	.  error
-
-	variable  goto 106
-	expression  goto 161
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	term  goto 108
-	factor  goto 109
-	func_call  goto 110
-	func_call_name  goto 111
-
-
-state 138
-	condition : expression NEQ . expression  (94)
-
-	PLUS  shift 101
-	MINUS  shift 102
-	LPAREN  shift 103
-	NUMBER  shift 104
-	IDENT  shift 105
-	.  error
-
-	variable  goto 106
-	expression  goto 162
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	term  goto 108
-	factor  goto 109
-	func_call  goto 110
-	func_call_name  goto 111
-
-
-state 139
-	condition : expression LE . expression  (96)
-
-	PLUS  shift 101
-	MINUS  shift 102
-	LPAREN  shift 103
-	NUMBER  shift 104
-	IDENT  shift 105
-	.  error
-
-	variable  goto 106
-	expression  goto 163
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	term  goto 108
-	factor  goto 109
-	func_call  goto 110
-	func_call_name  goto 111
-
-
-state 140
-	condition : expression LT . expression  (95)
-
-	PLUS  shift 101
-	MINUS  shift 102
-	LPAREN  shift 103
-	NUMBER  shift 104
-	IDENT  shift 105
-	.  error
-
-	variable  goto 106
-	expression  goto 164
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	term  goto 108
-	factor  goto 109
-	func_call  goto 110
-	func_call_name  goto 111
-
-
-state 141
-	condition : expression GE . expression  (98)
-
-	PLUS  shift 101
-	MINUS  shift 102
-	LPAREN  shift 103
-	NUMBER  shift 104
-	IDENT  shift 105
-	.  error
-
-	variable  goto 106
-	expression  goto 165
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	term  goto 108
-	factor  goto 109
-	func_call  goto 110
-	func_call_name  goto 111
-
-
-state 142
-	condition : expression GT . expression  (97)
-
-	PLUS  shift 101
-	MINUS  shift 102
-	LPAREN  shift 103
-	NUMBER  shift 104
-	IDENT  shift 105
-	.  error
-
-	variable  goto 106
-	expression  goto 166
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	term  goto 108
-	factor  goto 109
-	func_call  goto 110
-	func_call_name  goto 111
-
-
-state 143
-	if_statement : IF condition $$12 . THEN $$13 statement $$14 else_statement  (64)
-
-	THEN  shift 167
-	.  error
-
-
-state 144
-	while_statement : WHILE $$16 condition . $$17 DO $$18 statement  (71)
-	$$17 : .  (69)
-
-	.  reduce 69
-
-	$$17  goto 168
-
-
-state 145
-	indexed_variable : array_variable LBRACKET expression $$11 . RBRACKET  (59)
-
-	RBRACKET  shift 169
-	.  error
-
-
-state 146
-	proc_call_statement : proc_call_name LPAREN arg_list RPAREN .  (87)
-
-	.  reduce 87
-
-
-state 147
-	arg_list : arg_list COMMA . expression  (115)
-
-	PLUS  shift 101
-	MINUS  shift 102
-	LPAREN  shift 103
-	NUMBER  shift 104
-	IDENT  shift 105
-	.  error
-
-	variable  goto 106
-	expression  goto 170
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	term  goto 108
-	factor  goto 109
-	func_call  goto 110
-	func_call_name  goto 111
-
-
-state 148
-	forward_arg_list : LPAREN forward_arg RPAREN .  (18)
-
-	.  reduce 18
-
-
-state 149
-	forward_arg : forward_arg COMMA . IDENT  (19)
-
-	IDENT  shift 171
-	.  error
-
-
-state 150
-	func_decl : FUNCTION func_name LPAREN $$6 id_list $$7 . RPAREN SEMICOLON inblock  (35)
-
-	RPAREN  shift 172
-	.  error
-
-
-state 151
-	inblock : var_decl_part $$8 statement .  (38)
-
-	.  reduce 38
-
-
-state 152
-	proc_decl : PROCEDURE proc_name LPAREN $$4 id_list $$5 . RPAREN SEMICOLON inblock  (30)
-
-	RPAREN  shift 173
-	.  error
-
-
-state 153
-	for_statement : FOR IDENT $$19 ASSIGN expression . $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (85)
-	expression : expression . PLUS term  (103)
-	expression : expression . MINUS term  (104)
-	$$20 : .  (73)
-
-	PLUS  shift 131
-	MINUS  shift 132
-	TO  reduce 73
-
-	$$20  goto 174
-
-
 state 154
-	expression : MINUS $$32 term .  (102)
-	term : term . MULT factor  (106)
-	term : term . DIV factor  (107)
+	term : term MULT factor .  (102)
 
-	MULT  shift 134
-	DIV  shift 135
-	DO  reduce 102
-	ELSE  reduce 102
-	SEND  reduce 102
-	THEN  reduce 102
-	TO  reduce 102
-	PLUS  reduce 102
-	MINUS  reduce 102
-	EQ  reduce 102
-	NEQ  reduce 102
-	LE  reduce 102
-	LT  reduce 102
-	GE  reduce 102
-	GT  reduce 102
-	RPAREN  reduce 102
-	RBRACKET  reduce 102
-	COMMA  reduce 102
-	SEMICOLON  reduce 102
-	PERIOD  reduce 102
+	.  reduce 102
 
 
 state 155
-	factor : LPAREN expression RPAREN .  (110)
+	term : term DIV factor .  (103)
 
-	.  reduce 110
+	.  reduce 103
 
 
 state 156
-	expression : expression PLUS term .  (103)
-	term : term . MULT factor  (106)
-	term : term . DIV factor  (107)
+	func_call : func_call_name LPAREN arg_list . RPAREN  (108)
+	arg_list : arg_list . COMMA expression  (111)
 
-	MULT  shift 134
-	DIV  shift 135
-	DO  reduce 103
-	ELSE  reduce 103
-	SEND  reduce 103
-	THEN  reduce 103
-	TO  reduce 103
-	PLUS  reduce 103
-	MINUS  reduce 103
-	EQ  reduce 103
-	NEQ  reduce 103
-	LE  reduce 103
-	LT  reduce 103
-	GE  reduce 103
-	GT  reduce 103
-	RPAREN  reduce 103
-	RBRACKET  reduce 103
-	COMMA  reduce 103
-	SEMICOLON  reduce 103
-	PERIOD  reduce 103
-
-
-state 157
-	expression : expression MINUS term .  (104)
-	term : term . MULT factor  (106)
-	term : term . DIV factor  (107)
-
-	MULT  shift 134
-	DIV  shift 135
-	DO  reduce 104
-	ELSE  reduce 104
-	SEND  reduce 104
-	THEN  reduce 104
-	TO  reduce 104
-	PLUS  reduce 104
-	MINUS  reduce 104
-	EQ  reduce 104
-	NEQ  reduce 104
-	LE  reduce 104
-	LT  reduce 104
-	GE  reduce 104
-	GT  reduce 104
-	RPAREN  reduce 104
-	RBRACKET  reduce 104
-	COMMA  reduce 104
-	SEMICOLON  reduce 104
-	PERIOD  reduce 104
-
-
-state 158
-	term : term MULT factor .  (106)
-
-	.  reduce 106
-
-
-state 159
-	term : term DIV factor .  (107)
-
-	.  reduce 107
-
-
-state 160
-	func_call : func_call_name LPAREN arg_list . RPAREN  (112)
-	arg_list : arg_list . COMMA expression  (115)
-
-	RPAREN  shift 175
-	COMMA  shift 147
+	RPAREN  shift 171
+	COMMA  shift 143
 	.  error
 
 
-state 161
-	condition : expression EQ expression .  (93)
-	expression : expression . PLUS term  (103)
-	expression : expression . MINUS term  (104)
+state 157
+	indexed_variable : variable LBRACKET expression $$11 RBRACKET .  (56)
 
-	PLUS  shift 131
-	MINUS  shift 132
-	DO  reduce 93
-	THEN  reduce 93
+	.  reduce 56
+
+
+state 158
+	condition : expression EQ expression .  (89)
+	expression : expression . PLUS term  (99)
+	expression : expression . MINUS term  (100)
+
+	PLUS  shift 127
+	MINUS  shift 128
+	DO  reduce 89
+	THEN  reduce 89
+
+
+state 159
+	condition : expression NEQ expression .  (90)
+	expression : expression . PLUS term  (99)
+	expression : expression . MINUS term  (100)
+
+	PLUS  shift 127
+	MINUS  shift 128
+	DO  reduce 90
+	THEN  reduce 90
+
+
+state 160
+	condition : expression LE expression .  (92)
+	expression : expression . PLUS term  (99)
+	expression : expression . MINUS term  (100)
+
+	PLUS  shift 127
+	MINUS  shift 128
+	DO  reduce 92
+	THEN  reduce 92
+
+
+state 161
+	condition : expression LT expression .  (91)
+	expression : expression . PLUS term  (99)
+	expression : expression . MINUS term  (100)
+
+	PLUS  shift 127
+	MINUS  shift 128
+	DO  reduce 91
+	THEN  reduce 91
 
 
 state 162
-	condition : expression NEQ expression .  (94)
-	expression : expression . PLUS term  (103)
-	expression : expression . MINUS term  (104)
+	condition : expression GE expression .  (94)
+	expression : expression . PLUS term  (99)
+	expression : expression . MINUS term  (100)
 
-	PLUS  shift 131
-	MINUS  shift 132
+	PLUS  shift 127
+	MINUS  shift 128
 	DO  reduce 94
 	THEN  reduce 94
 
 
 state 163
-	condition : expression LE expression .  (96)
-	expression : expression . PLUS term  (103)
-	expression : expression . MINUS term  (104)
+	condition : expression GT expression .  (93)
+	expression : expression . PLUS term  (99)
+	expression : expression . MINUS term  (100)
 
-	PLUS  shift 131
-	MINUS  shift 132
-	DO  reduce 96
-	THEN  reduce 96
+	PLUS  shift 127
+	MINUS  shift 128
+	DO  reduce 93
+	THEN  reduce 93
 
 
 state 164
-	condition : expression LT expression .  (95)
-	expression : expression . PLUS term  (103)
-	expression : expression . MINUS term  (104)
+	if_statement : IF condition $$12 THEN . $$13 statement $$14 else_statement  (60)
+	$$13 : .  (58)
 
-	PLUS  shift 131
-	MINUS  shift 132
-	DO  reduce 95
-	THEN  reduce 95
+	.  reduce 58
+
+	$$13  goto 172
 
 
 state 165
-	condition : expression GE expression .  (98)
-	expression : expression . PLUS term  (103)
-	expression : expression . MINUS term  (104)
+	while_statement : WHILE $$16 condition $$17 . DO $$18 statement  (67)
 
-	PLUS  shift 131
-	MINUS  shift 132
-	DO  reduce 98
-	THEN  reduce 98
-
-
-state 166
-	condition : expression GT expression .  (97)
-	expression : expression . PLUS term  (103)
-	expression : expression . MINUS term  (104)
-
-	PLUS  shift 131
-	MINUS  shift 132
-	DO  reduce 97
-	THEN  reduce 97
-
-
-state 167
-	if_statement : IF condition $$12 THEN . $$13 statement $$14 else_statement  (64)
-	$$13 : .  (62)
-
-	.  reduce 62
-
-	$$13  goto 176
-
-
-state 168
-	while_statement : WHILE $$16 condition $$17 . DO $$18 statement  (71)
-
-	DO  shift 177
+	DO  shift 173
 	.  error
 
 
-state 169
-	indexed_variable : array_variable LBRACKET expression $$11 RBRACKET .  (59)
+state 166
+	expression : expression . PLUS term  (99)
+	expression : expression . MINUS term  (100)
+	arg_list : arg_list COMMA expression .  (111)
 
-	.  reduce 59
-
-
-state 170
-	expression : expression . PLUS term  (103)
-	expression : expression . MINUS term  (104)
-	arg_list : arg_list COMMA expression .  (115)
-
-	PLUS  shift 131
-	MINUS  shift 132
-	RPAREN  reduce 115
-	COMMA  reduce 115
+	PLUS  shift 127
+	MINUS  shift 128
+	RPAREN  reduce 111
+	COMMA  reduce 111
 
 
-state 171
+state 167
 	forward_arg : forward_arg COMMA IDENT .  (19)
 
 	.  reduce 19
 
 
-state 172
+state 168
 	func_decl : FUNCTION func_name LPAREN $$6 id_list $$7 RPAREN . SEMICOLON inblock  (35)
 
-	SEMICOLON  shift 178
+	SEMICOLON  shift 174
 	.  error
 
 
-state 173
+state 169
 	proc_decl : PROCEDURE proc_name LPAREN $$4 id_list $$5 RPAREN . SEMICOLON inblock  (30)
 
-	SEMICOLON  shift 179
+	SEMICOLON  shift 175
 	.  error
 
 
-state 174
-	for_statement : FOR IDENT $$19 ASSIGN expression $$20 . TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (85)
+state 170
+	for_statement : FOR IDENT $$19 ASSIGN expression $$20 . TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (81)
 
-	TO  shift 180
+	TO  shift 176
 	.  error
 
 
-state 175
-	func_call : func_call_name LPAREN arg_list RPAREN .  (112)
+state 171
+	func_call : func_call_name LPAREN arg_list RPAREN .  (108)
 
-	.  reduce 112
+	.  reduce 108
 
 
-state 176
-	if_statement : IF condition $$12 THEN $$13 . statement $$14 else_statement  (64)
+state 172
+	if_statement : IF condition $$12 THEN $$13 . statement $$14 else_statement  (60)
 	$$9 : .  (42)
 	$$10 : .  (44)
-	null_statement : .  (92)
+	null_statement : .  (88)
 
 	SBEGIN  shift 43
 	FOR  shift 44
 	READ  shift 45
 	WRITE  shift 46
 	IDENT  shift 47
-	ELSE  reduce 92
-	SEND  reduce 92
+	ELSE  reduce 88
+	SEND  reduce 88
 	IF  reduce 42
 	WHILE  reduce 44
-	SEMICOLON  reduce 92
-	PERIOD  reduce 92
+	SEMICOLON  reduce 88
+	PERIOD  reduce 88
 
-	statement  goto 181
-	assignment_statement  goto 49
-	$$9  goto 50
-	$$10  goto 51
-	for_statement  goto 52
-	proc_call_statement  goto 53
-	null_statement  goto 54
-	block_statement  goto 55
-	read_statement  goto 56
-	write_statement  goto 57
-	variable  goto 58
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	proc_call_name  goto 64
+	variable  goto 48
+	statement  goto 177
+	assignment_statement  goto 50
+	$$9  goto 51
+	$$10  goto 52
+	for_statement  goto 53
+	proc_call_statement  goto 54
+	null_statement  goto 55
+	block_statement  goto 56
+	read_statement  goto 57
+	write_statement  goto 58
+	indexed_variable  goto 59
+	proc_call_name  goto 60
 
 
-state 177
-	while_statement : WHILE $$16 condition $$17 DO . $$18 statement  (71)
-	$$18 : .  (70)
+state 173
+	while_statement : WHILE $$16 condition $$17 DO . $$18 statement  (67)
+	$$18 : .  (66)
 
-	.  reduce 70
+	.  reduce 66
 
-	$$18  goto 182
+	$$18  goto 178
 
 
-state 178
+state 174
 	func_decl : FUNCTION func_name LPAREN $$6 id_list $$7 RPAREN SEMICOLON . inblock  (35)
 	var_decl_part : .  (4)
 
@@ -2327,13 +2184,13 @@ state 178
 	SEMICOLON  reduce 4
 	IDENT  reduce 4
 
-	var_decl_part  goto 92
+	var_decl_part  goto 88
 	var_decl_list  goto 9
 	var_decl  goto 10
-	inblock  goto 183
+	inblock  goto 179
 
 
-state 179
+state 175
 	proc_decl : PROCEDURE proc_name LPAREN $$4 id_list $$5 RPAREN SEMICOLON . inblock  (30)
 	var_decl_part : .  (4)
 
@@ -2347,325 +2204,309 @@ state 179
 	SEMICOLON  reduce 4
 	IDENT  reduce 4
 
-	var_decl_part  goto 92
+	var_decl_part  goto 88
 	var_decl_list  goto 9
 	var_decl  goto 10
-	inblock  goto 184
+	inblock  goto 180
 
 
-state 180
-	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO . $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (85)
-	$$21 : .  (74)
+state 176
+	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO . $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (81)
+	$$21 : .  (70)
 
-	.  reduce 74
+	.  reduce 70
 
-	$$21  goto 185
-
-
-state 181
-	if_statement : IF condition $$12 THEN $$13 statement . $$14 else_statement  (64)
-	$$14 : .  (63)
-
-	.  reduce 63
-
-	$$14  goto 186
+	$$21  goto 181
 
 
-state 182
-	while_statement : WHILE $$16 condition $$17 DO $$18 . statement  (71)
+state 177
+	if_statement : IF condition $$12 THEN $$13 statement . $$14 else_statement  (60)
+	$$14 : .  (59)
+
+	.  reduce 59
+
+	$$14  goto 182
+
+
+state 178
+	while_statement : WHILE $$16 condition $$17 DO $$18 . statement  (67)
 	$$9 : .  (42)
 	$$10 : .  (44)
-	null_statement : .  (92)
+	null_statement : .  (88)
 
 	SBEGIN  shift 43
 	FOR  shift 44
 	READ  shift 45
 	WRITE  shift 46
 	IDENT  shift 47
-	ELSE  reduce 92
-	SEND  reduce 92
+	ELSE  reduce 88
+	SEND  reduce 88
 	IF  reduce 42
 	WHILE  reduce 44
-	SEMICOLON  reduce 92
-	PERIOD  reduce 92
+	SEMICOLON  reduce 88
+	PERIOD  reduce 88
 
-	statement  goto 187
-	assignment_statement  goto 49
-	$$9  goto 50
-	$$10  goto 51
-	for_statement  goto 52
-	proc_call_statement  goto 53
-	null_statement  goto 54
-	block_statement  goto 55
-	read_statement  goto 56
-	write_statement  goto 57
-	variable  goto 58
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	proc_call_name  goto 64
+	variable  goto 48
+	statement  goto 183
+	assignment_statement  goto 50
+	$$9  goto 51
+	$$10  goto 52
+	for_statement  goto 53
+	proc_call_statement  goto 54
+	null_statement  goto 55
+	block_statement  goto 56
+	read_statement  goto 57
+	write_statement  goto 58
+	indexed_variable  goto 59
+	proc_call_name  goto 60
 
 
-state 183
+state 179
 	func_decl : FUNCTION func_name LPAREN $$6 id_list $$7 RPAREN SEMICOLON inblock .  (35)
 
 	.  reduce 35
 
 
-state 184
+state 180
 	proc_decl : PROCEDURE proc_name LPAREN $$4 id_list $$5 RPAREN SEMICOLON inblock .  (30)
 
 	.  reduce 30
 
 
-state 185
-	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 . $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (85)
-	$$22 : .  (75)
-
-	.  reduce 75
-
-	$$22  goto 188
-
-
-186: shift/reduce conflict (shift 189, reduce 65) on ELSE
-state 186
-	if_statement : IF condition $$12 THEN $$13 statement $$14 . else_statement  (64)
-	else_statement : .  (65)
-
-	ELSE  shift 189
-	SEND  reduce 65
-	SEMICOLON  reduce 65
-	PERIOD  reduce 65
-
-	else_statement  goto 190
-
-
-state 187
-	while_statement : WHILE $$16 condition $$17 DO $$18 statement .  (71)
+state 181
+	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 . $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (81)
+	$$22 : .  (71)
 
 	.  reduce 71
 
-
-state 188
-	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 . $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (85)
-	$$23 : .  (76)
-
-	.  reduce 76
-
-	$$23  goto 191
+	$$22  goto 184
 
 
-state 189
-	else_statement : ELSE . $$15 statement  (67)
-	$$15 : .  (66)
+182: shift/reduce conflict (shift 185, reduce 61) on ELSE
+state 182
+	if_statement : IF condition $$12 THEN $$13 statement $$14 . else_statement  (60)
+	else_statement : .  (61)
 
-	.  reduce 66
+	ELSE  shift 185
+	SEND  reduce 61
+	SEMICOLON  reduce 61
+	PERIOD  reduce 61
 
-	$$15  goto 192
-
-
-state 190
-	if_statement : IF condition $$12 THEN $$13 statement $$14 else_statement .  (64)
-
-	.  reduce 64
+	else_statement  goto 186
 
 
-state 191
-	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 . expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (85)
-
-	PLUS  shift 101
-	MINUS  shift 102
-	LPAREN  shift 103
-	NUMBER  shift 104
-	IDENT  shift 105
-	.  error
-
-	variable  goto 106
-	expression  goto 193
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	term  goto 108
-	factor  goto 109
-	func_call  goto 110
-	func_call_name  goto 111
-
-
-state 192
-	else_statement : ELSE $$15 . statement  (67)
-	$$9 : .  (42)
-	$$10 : .  (44)
-	null_statement : .  (92)
-
-	SBEGIN  shift 43
-	FOR  shift 44
-	READ  shift 45
-	WRITE  shift 46
-	IDENT  shift 47
-	ELSE  reduce 92
-	SEND  reduce 92
-	IF  reduce 42
-	WHILE  reduce 44
-	SEMICOLON  reduce 92
-	PERIOD  reduce 92
-
-	statement  goto 194
-	assignment_statement  goto 49
-	$$9  goto 50
-	$$10  goto 51
-	for_statement  goto 52
-	proc_call_statement  goto 53
-	null_statement  goto 54
-	block_statement  goto 55
-	read_statement  goto 56
-	write_statement  goto 57
-	variable  goto 58
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	proc_call_name  goto 64
-
-
-state 193
-	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression . $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (85)
-	expression : expression . PLUS term  (103)
-	expression : expression . MINUS term  (104)
-	$$24 : .  (77)
-
-	PLUS  shift 131
-	MINUS  shift 132
-	DO  reduce 77
-
-	$$24  goto 195
-
-
-state 194
-	else_statement : ELSE $$15 statement .  (67)
+state 183
+	while_statement : WHILE $$16 condition $$17 DO $$18 statement .  (67)
 
 	.  reduce 67
 
 
-state 195
-	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 . DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (85)
+state 184
+	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 . $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (81)
+	$$23 : .  (72)
 
-	DO  shift 196
+	.  reduce 72
+
+	$$23  goto 187
+
+
+state 185
+	else_statement : ELSE . $$15 statement  (63)
+	$$15 : .  (62)
+
+	.  reduce 62
+
+	$$15  goto 188
+
+
+state 186
+	if_statement : IF condition $$12 THEN $$13 statement $$14 else_statement .  (60)
+
+	.  reduce 60
+
+
+state 187
+	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 . expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (81)
+
+	PLUS  shift 97
+	MINUS  shift 98
+	LPAREN  shift 99
+	NUMBER  shift 100
+	IDENT  shift 101
 	.  error
 
-
-state 196
-	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO . $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (85)
-	$$25 : .  (78)
-
-	.  reduce 78
-
-	$$25  goto 197
-
-
-state 197
-	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 . $$26 statement $$27 $$28 $$29 $$30 $$31  (85)
-	$$26 : .  (79)
-
-	.  reduce 79
-
-	$$26  goto 198
+	variable  goto 102
+	expression  goto 189
+	indexed_variable  goto 59
+	term  goto 104
+	factor  goto 105
+	func_call  goto 106
+	func_call_name  goto 107
 
 
-state 198
-	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 . statement $$27 $$28 $$29 $$30 $$31  (85)
+state 188
+	else_statement : ELSE $$15 . statement  (63)
 	$$9 : .  (42)
 	$$10 : .  (44)
-	null_statement : .  (92)
+	null_statement : .  (88)
 
 	SBEGIN  shift 43
 	FOR  shift 44
 	READ  shift 45
 	WRITE  shift 46
 	IDENT  shift 47
-	ELSE  reduce 92
-	SEND  reduce 92
+	ELSE  reduce 88
+	SEND  reduce 88
 	IF  reduce 42
 	WHILE  reduce 44
-	SEMICOLON  reduce 92
-	PERIOD  reduce 92
+	SEMICOLON  reduce 88
+	PERIOD  reduce 88
 
-	statement  goto 199
-	assignment_statement  goto 49
-	$$9  goto 50
-	$$10  goto 51
-	for_statement  goto 52
-	proc_call_statement  goto 53
-	null_statement  goto 54
-	block_statement  goto 55
-	read_statement  goto 56
-	write_statement  goto 57
-	variable  goto 58
-	entire_variable  goto 59
-	component_variable  goto 60
-	variable_id  goto 61
-	indexed_variable  goto 62
-	array_variable  goto 63
-	proc_call_name  goto 64
+	variable  goto 48
+	statement  goto 190
+	assignment_statement  goto 50
+	$$9  goto 51
+	$$10  goto 52
+	for_statement  goto 53
+	proc_call_statement  goto 54
+	null_statement  goto 55
+	block_statement  goto 56
+	read_statement  goto 57
+	write_statement  goto 58
+	indexed_variable  goto 59
+	proc_call_name  goto 60
+
+
+state 189
+	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression . $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (81)
+	expression : expression . PLUS term  (99)
+	expression : expression . MINUS term  (100)
+	$$24 : .  (73)
+
+	PLUS  shift 127
+	MINUS  shift 128
+	DO  reduce 73
+
+	$$24  goto 191
+
+
+state 190
+	else_statement : ELSE $$15 statement .  (63)
+
+	.  reduce 63
+
+
+state 191
+	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 . DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (81)
+
+	DO  shift 192
+	.  error
+
+
+state 192
+	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO . $$25 $$26 statement $$27 $$28 $$29 $$30 $$31  (81)
+	$$25 : .  (74)
+
+	.  reduce 74
+
+	$$25  goto 193
+
+
+state 193
+	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 . $$26 statement $$27 $$28 $$29 $$30 $$31  (81)
+	$$26 : .  (75)
+
+	.  reduce 75
+
+	$$26  goto 194
+
+
+state 194
+	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 . statement $$27 $$28 $$29 $$30 $$31  (81)
+	$$9 : .  (42)
+	$$10 : .  (44)
+	null_statement : .  (88)
+
+	SBEGIN  shift 43
+	FOR  shift 44
+	READ  shift 45
+	WRITE  shift 46
+	IDENT  shift 47
+	ELSE  reduce 88
+	SEND  reduce 88
+	IF  reduce 42
+	WHILE  reduce 44
+	SEMICOLON  reduce 88
+	PERIOD  reduce 88
+
+	variable  goto 48
+	statement  goto 195
+	assignment_statement  goto 50
+	$$9  goto 51
+	$$10  goto 52
+	for_statement  goto 53
+	proc_call_statement  goto 54
+	null_statement  goto 55
+	block_statement  goto 56
+	read_statement  goto 57
+	write_statement  goto 58
+	indexed_variable  goto 59
+	proc_call_name  goto 60
+
+
+state 195
+	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement . $$27 $$28 $$29 $$30 $$31  (81)
+	$$27 : .  (76)
+
+	.  reduce 76
+
+	$$27  goto 196
+
+
+state 196
+	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 . $$28 $$29 $$30 $$31  (81)
+	$$28 : .  (77)
+
+	.  reduce 77
+
+	$$28  goto 197
+
+
+state 197
+	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 . $$29 $$30 $$31  (81)
+	$$29 : .  (78)
+
+	.  reduce 78
+
+	$$29  goto 198
+
+
+state 198
+	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 . $$30 $$31  (81)
+	$$30 : .  (79)
+
+	.  reduce 79
+
+	$$30  goto 199
 
 
 state 199
-	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement . $$27 $$28 $$29 $$30 $$31  (85)
-	$$27 : .  (80)
+	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 . $$31  (81)
+	$$31 : .  (80)
 
 	.  reduce 80
 
-	$$27  goto 200
+	$$31  goto 200
 
 
 state 200
-	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 . $$28 $$29 $$30 $$31  (85)
-	$$28 : .  (81)
+	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31 .  (81)
 
 	.  reduce 81
 
-	$$28  goto 201
+
+State 182 contains 1 shift/reduce conflict.
 
 
-state 201
-	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 . $$29 $$30 $$31  (85)
-	$$29 : .  (82)
-
-	.  reduce 82
-
-	$$29  goto 202
-
-
-state 202
-	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 . $$30 $$31  (85)
-	$$30 : .  (83)
-
-	.  reduce 83
-
-	$$30  goto 203
-
-
-state 203
-	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 . $$31  (85)
-	$$31 : .  (84)
-
-	.  reduce 84
-
-	$$31  goto 204
-
-
-state 204
-	for_statement : FOR IDENT $$19 ASSIGN expression $$20 TO $$21 $$22 $$23 expression $$24 DO $$25 $$26 statement $$27 $$28 $$29 $$30 $$31 .  (85)
-
-	.  reduce 85
-
-
-State 186 contains 1 shift/reduce conflict.
-
-
-40 terminals, 81 nonterminals
-122 grammar rules, 205 states
+40 terminals, 77 nonterminals
+118 grammar rules, 201 states

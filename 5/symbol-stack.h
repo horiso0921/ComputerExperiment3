@@ -20,6 +20,7 @@ void lookall(Factor *factor){
         return;
 }
 
+
 Factor insert(char *name, int flag) {
         // printf("insert\n");
         Factor *tmp;

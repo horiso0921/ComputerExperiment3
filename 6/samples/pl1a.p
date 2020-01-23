@@ -1,5 +1,5 @@
 program PL1A;
-var n, temp,x;
+var n, temp;
 procedure fact(n);
 begin
       if n <= 1 then

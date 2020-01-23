@@ -452,7 +452,7 @@ assignment_statement
                 Factor arg1, arg2;
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
-                tmp->command = Store; /* 命令の種類を加算に設定 */
+                tmp->command = Store; 
                 arg1 = factorpop();/*スタックから第1引数をポップ*/
                 arg2 = factorpop();/*スタックから第2引数をポップ*/
                 (tmp->args).store.arg1 = arg1; /* 命令の第 1 引数を指定 */
@@ -542,10 +542,10 @@ expression
         | expression PLUS term
         {
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
-                Factor arg1, arg2, retval; /* 加算の引数・結果 */
+                Factor arg1, arg2, retval; 
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
-                tmp->command = Add; /* 命令の種類を加算に設定 */
+                tmp->command = Add; 
                 arg2 = factorpop();/*スタックから第2引数をポップ*/
                 arg1 = factorpop();/*スタックから第1引数をポップ*/
                 retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
@@ -555,15 +555,15 @@ expression
                 (tmp->args).cal.arg2 = arg2; /* 命令の第 2 引数を指定 */
                 (tmp->args).cal.retval = retval; /* 結果のレジスタを指定 */
                 add_node(tmp);
-                factorpush( retval ); /* 加算の結果をスタックにプッシュ */
+                factorpush( retval ); 
         }
         | expression MINUS term
         {
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
-                Factor arg1, arg2, retval; /* 加算の引数・結果 */
+                Factor arg1, arg2, retval; 
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
-                tmp->command = Sub; /* 命令の種類を加算に設定 */
+                tmp->command = Sub; 
                 arg2 = factorpop();/*スタックから第2引数をポップ*/
                 arg1 = factorpop();/*スタックから第1引数をポップ*/
                 retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
@@ -573,7 +573,7 @@ expression
                 (tmp->args).cal.arg2 = arg2; /* 命令の第 2 引数を指定 */
                 (tmp->args).cal.retval = retval; /* 結果のレジスタを指定 */
                 add_node(tmp);
-                factorpush( retval ); /* 加算の結果をスタックにプッシュ */
+                factorpush( retval ); 
         }
         ;
 
@@ -582,10 +582,10 @@ term
         | term MULT factor
         {
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
-                Factor arg1, arg2, retval; /* 加算の引数・結果 */
+                Factor arg1, arg2, retval;
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
-                tmp->command = Mul; /* 命令の種類を加算に設定 */
+                tmp->command = Mul;
                 arg2 = factorpop();/*スタックから第2引数をポップ*/
                 arg1 = factorpop();/*スタックから第1引数をポップ*/
                 retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
@@ -595,16 +595,16 @@ term
                 (tmp->args).cal.arg2 = arg2; /* 命令の第 2 引数を指定 */
                 (tmp->args).cal.retval = retval; /* 結果のレジスタを指定 */
                 add_node(tmp);
-                factorpush( retval ); /* 加算の結果をスタックにプッシュ */
+                factorpush( retval ); 
         }
         ;
         | term DIV factor
         {
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
-                Factor arg1, arg2, retval; /* 加算の引数・結果 */
+                Factor arg1, arg2, retval; 
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
-                tmp->command = Div; /* 命令の種類を加算に設定 */
+                tmp->command = Div; 
                 arg2 = factorpop();/*スタックから第2引数をポップ*/
                 arg1 = factorpop();/*スタックから第1引数をポップ*/
                 retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
@@ -614,7 +614,7 @@ term
                 (tmp->args).cal.arg2 = arg2; /* 命令の第 2 引数を指定 */
                 (tmp->args).cal.retval = retval; /* 結果のレジスタを指定 */
                 add_node(tmp);
-                factorpush( retval ); /* 加算の結果をスタックにプッシュ */
+                factorpush( retval ); 
         }
         ;
 
@@ -622,10 +622,10 @@ factor
         : var_name
         {
                 LLVMcode *tmp; /* 生成した命令へのポインタ */
-                Factor arg1, retval; /* 加算の引数・結果 */
+                Factor arg1, retval; 
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
-                tmp->command = Load; /* 命令の種類を加算に設定 */
+                tmp->command = Load; 
                 arg1 = factorpop();/*スタックから第1引数をポップ*/
                 retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
                 retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */

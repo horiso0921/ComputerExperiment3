@@ -1,5 +1,6 @@
 program EX1;
-var Begin;
+var x;
 begin
-   Begin := 21;
+   x := 255;
+   write(x);
 end.

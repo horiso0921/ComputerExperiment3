@@ -190,7 +190,6 @@ statement
         : assignment_statement
         |
         {
-                if_flg = 0;
                 Brdecl *br_tmp;
                 br_tmp = (Brdecl *)malloc(sizeof(Brdecl));
                 add_brnode(br_tmp);
@@ -198,11 +197,9 @@ statement
         if_statement
         {
                 create_llvmcode(Label);
-                br_decl->uncoll = Last_Register;
-                if (if_flg) br_decl->eluncoll = br_decl->uncoll;
+                br_decl->end = Last_Register;
                 Last_Register ++;
                 br_decl = br_decl->before;
-                if_flg = 0;
         }
         | 
         {
@@ -236,7 +233,7 @@ statement
         {
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
-                tmp->command = Call; /* 命令の種類を加算に設定 */
+                tmp->command = Call; 
                 Factor arg;
                 for (i = 0; i < 11;i++){
                         arg = factorpop();
@@ -267,44 +264,41 @@ assignment_statement
 if_statement 
         : IF condition 
         {
-                tmp = (LLVMcode *)malloc(sizeof(LLVMcode));
-                tmp->command = BrCond;
-                tmp->next = NULL;
-                (tmp->args).brcond.arg1 = factorpop();
-                (tmp->args).brcond.arg2 = &br_decl->coll;
-                (tmp->args).brcond.arg3 = &br_decl->eluncoll;
-                br_decl->coll = Last_Register;
-                add_llvmnode(tmp);
+                create_llvmcode(BrCond);
         }
-        THEN 
+                THEN 
         {
                 create_llvmcode(Label);
                 Last_Register ++;
-        } statement else_statement
+        }
+                statement 
+        {
+                br_decl->uncoll = Last_Register;
+        }
+                else_statement
         {
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode));
                 tmp->command = BrUncond;
                 tmp->next = NULL;
-                (tmp->args).bruncond.arg1 = &br_decl->uncoll;
+                (tmp->args).bruncond.arg1 = &br_decl->end;
                 add_llvmnode(tmp);
         }
         ;
 
 else_statement 
         : /* empty */
-        { if_flg = 1;} 
         | ELSE 
         {
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode));
                 tmp->command = BrUncond;
                 tmp->next = NULL;
-                (tmp->args).bruncond.arg1 = &br_decl->uncoll;
+                (tmp->args).bruncond.arg1 = &br_decl->end;
                 add_llvmnode(tmp);
                 create_llvmcode(Label);
-                br_decl->eluncoll = Last_Register;
                 Last_Register ++;
         } statement
         ;
+
 
 while_statement 
         : WHILE 
@@ -315,7 +309,6 @@ while_statement
         } condition 
         {
                 create_llvmcode(BrCond);
-                add_llvmnode(tmp);
         } DO 
         {
                 create_llvmcode(Label);
@@ -325,7 +318,7 @@ while_statement
                 
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
-                tmp->command = BrUncond; /* 命令の種類を加算に設定 */
+                tmp->command = BrUncond; 
                 (tmp->args).bruncond.arg1 = &br_decl->cond;
                 add_llvmnode(tmp);
         }
@@ -351,12 +344,8 @@ for_statement
                 tmp->next = NULL;
                 (tmp->args).bruncond.arg1 = &br_decl->cond;
                 add_llvmnode(tmp);
-        }
-        {
                 create_llvmcode(Label);
                 Last_Register++;
-        }
-        {
                 factorpush(lookup($2));
                 create_llvmcode(Load);
         }
@@ -368,8 +357,6 @@ for_statement
                 DO 
         {
                 create_llvmcode(BrCond);
-        }
-        {
                 create_llvmcode(Label);
                 Last_Register ++;
         }
@@ -380,32 +367,21 @@ for_statement
                 tmp->next = NULL;
                 (tmp->args).bruncond.arg1 = &br_decl->inc;
                 add_llvmnode(tmp);
-        }
-        {
                 create_llvmcode(Label);
                 br_decl->inc = Last_Register;
                 Last_Register ++;
-        }
-        {
                 factorpush(lookup($2));
                 factorpush(lookup($2));
                 create_llvmcode(Load);
-        }
-        {
-                
-                Factor arg2; /* 加算の引数・結果 */
+                Factor arg2; 
                 arg2.type = CONSTANT;
                 arg2.cal = 1;
                 factorpush(arg2);
                 create_llvmcode(Add);
-        }
-        {
                 create_llvmcode(Store);
-        }
-        {
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
-                tmp->command = BrUncond; /* 命令の種類を加算に設定 */
+                tmp->command = BrUncond; 
                 (tmp->args).bruncond.arg1 = &br_decl->cond;
                 add_llvmnode(tmp);
         }
@@ -427,10 +403,10 @@ block_statement
 read_statement 
         : READ LPAREN IDENT {factorpush(lookup($3));} RPAREN 
         {
-                Factor proc, arg1, retval; /* 加算の引数・結果 */
+                Factor proc, arg1, retval; 
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
-                tmp->command = Call; /* 命令の種類を加算に設定 */
+                tmp->command = Call; 
                 arg1 = factorpop();/*スタックから第2引数をポップ*/
                 retval.type = LOCAL_VAR;
                 retval.cal = Last_Register;
@@ -447,10 +423,10 @@ read_statement
 write_statement 
         : WRITE LPAREN expression RPAREN
         {
-                Factor proc, arg1, retval; /* 加算の引数・結果 */
+                Factor proc, arg1, retval; 
                 tmp = (LLVMcode *)malloc(sizeof(LLVMcode)); /*メモリ確保 */
                 tmp->next = NULL; /* 次の命令へのポインタを初期化 */
-                tmp->command = Call; /* 命令の種類を加算に設定 */
+                tmp->command = Call; 
                 arg1 = factorpop();/*スタックから第2引数をポップ*/
                 retval.type = LOCAL_VAR;
                 retval.cal = Last_Register;
@@ -507,7 +483,7 @@ expression
         | MINUS 
         {
                 Factor arg1;
-                arg1.type = CONSTANT;/*第1引数*/
+                arg1.type = CONSTANT;
                 arg1.cal = 0;
                 factorpush(arg1);
         }
@@ -531,12 +507,10 @@ term
         {
                 create_llvmcode(Mul);
         }
-        ;
         | term DIV factor
         {
                 create_llvmcode(Div);
         }
-        ;
         ;
 
 factor 

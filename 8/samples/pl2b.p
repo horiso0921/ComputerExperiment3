@@ -1,5 +1,5 @@
 program PL2B;
-var m, n, a[1];
+var m, n;
 function power(m,n);
 if n <= 0 then
    power := 1

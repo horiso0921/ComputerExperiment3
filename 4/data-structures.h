@@ -113,8 +113,6 @@ Factor factorpop(){
   tmp = fstack.element[fstack.top];
   fstack.top --;
   return tmp;
-
-
 }
 
 void factorpush(Factor x) {

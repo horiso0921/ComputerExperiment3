@@ -12,6 +12,7 @@ void add_llvmnode(LLVMcode *tmp){
         }
 }
 
+
 void add_globalnode(LLVMcode *tmp){
         if (global_codehd == NULL){
                 Fundecl *glob;

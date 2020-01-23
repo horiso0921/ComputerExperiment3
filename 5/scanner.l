@@ -39,6 +39,7 @@ var             return VAR;
 while           return WHILE;
 write           return WRITE;
 "+"             return PLUS;
+"++"            return PP;
 "-"             return MINUS;
 "*"             return MULT;
 "="             return EQ;
