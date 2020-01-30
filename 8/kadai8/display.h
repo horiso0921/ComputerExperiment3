@@ -52,7 +52,7 @@ void displayLlvmcodes( LLVMcode *code){
                         displayFactor( (code->args).alloca.retval);
                         fprintf(fp," = alloca");
                         if ((code->args).alloca.retval.fin != 0){
-                                fprintf(fp," [%d x i32] zeroinitializer, align 16\n",(code->args).alloca.retval.fin - (code->args).alloca.retval.off + 1);
+                                fprintf(fp," [%d x i32], align 16\n",(code->args).alloca.retval.fin - (code->args).alloca.retval.off + 1);
                         } else {
                                 fprintf(fp," i32, align 4\n");
                         }
