@@ -155,22 +155,19 @@ void Labelcode(){
     (tmp->args).label.l = Last_Register;
 }
 
-void Icmpcode(){
-    Factor arg1, arg2, retval; 
-    retval.type = LOCAL_VAR;
-    retval.cal = Last_Register;
-    Last_Register++;
-    arg2 = factorpop();/*スタックから第2引数をポップ*/
-    arg1 = factorpop();/*スタックから第1引数をポップ*/
-    (tmp->args).icmp.arg1 = arg1; /* 命令の第 1 引数を指定 */
-    (tmp->args).icmp.arg2 = arg2; /* 命令の第 2 引数を指定 */
-    (tmp->args).icmp.retval = retval; /* 命令の第 1 引数を指定 */
-    (tmp->args).icmp.type = icmptype;
-    factorpush(retval);
+void Calcode(){
+    Factor retval;
+    retval.type = LOCAL_VAR; /* 結果を格納するレジスタは局所 */
+    retval.cal = Last_Register; /* 新規のレジスタ番号を取得 */
+    Last_Register ++; /* カウンタをインクリメント */
+    (tmp->args).calc.arg2 = factorpop(); /* 命令の第 1 引数を指定 */
+    (tmp->args).calc.arg1 = factorpop(); /* 命令の第 2 引数を指定 */
+    (tmp->args).calc.retval = retval; /* 結果のレジスタを指定 */
+    factorpush( retval );  /* 計算の結果をスタックにプッシュ */
 }
 
 void Icmpcode(){
-    Factor arg1, arg2, retval; /* 加算の引数・結果 */
+    Factor arg1, arg2, retval; 
     retval.type = LOCAL_VAR;
     retval.cal = Last_Register;
     Last_Register++;

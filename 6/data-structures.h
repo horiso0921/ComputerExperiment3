@@ -145,5 +145,3 @@ typedef struct brdecl{
 } Brdecl;
 
 Brdecl *br_decl = NULL;
-
-

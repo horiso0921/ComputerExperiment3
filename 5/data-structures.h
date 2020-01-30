@@ -7,6 +7,7 @@ typedef enum {
   CONSTANT    /* 定数     */
 } Scope;
 
+
 /* LLVM命令名の定義 */
 typedef enum { 
   Alloca,   /* alloca */

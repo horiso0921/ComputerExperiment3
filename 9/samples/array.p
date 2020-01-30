@@ -1,10 +1,10 @@
 program ARRAY;
-var a[1.10], i, s;
+var a[1..10], i, s;
 begin
    i := 1;
    while i <= 10 do
       begin
-	 a[i] := i;
+	 a[i] := a[a[i]];
 	 i := i + 1;
       end;
    i := 1;

@@ -330,7 +330,7 @@ variable
                 factorpush(f_tmp);
                 $$ = f_tmp.off;
         }
-        | indexed_variable
+        | indexed_variable RBRACKET
         {
                 create_llvmcode(GetElem);
         }
@@ -347,7 +347,6 @@ indexed_variable
                 create_llvmcode(Sub);
                 create_llvmcode(Sext);
         }
-        RBRACKET
         ;
 
 
@@ -398,7 +397,6 @@ while_statement
         } condition 
         {
                 create_llvmcode(BrCond);
-                add_llvmnode(tmp);
         } DO 
         {
                 create_llvmcode(Label);

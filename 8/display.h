@@ -66,7 +66,6 @@ void displayLlvmcodes( LLVMcode *code){
                                 fprintf(fp," i32 0, align 4\n");
                         }
                         break;
-                        break;
                 case Store:
                         fprintf(fp,"store i32 ");
                         displayFactor( (code->args).store.arg1);

@@ -121,7 +121,9 @@ forward_arg_list
 
 forward_arg
         : forward_arg COMMA IDENT
+        | forward_arg COMMA IDENT LBRACKET NUMBER INTERVAL NUMBER RBRACKET
         | IDENT
+        | IDENT LBRACKET NUMBER INTERVAL NUMBER RBRACKET
         ;
 
 subprog_decl_part
@@ -360,7 +362,7 @@ variable
                 factorpush(f_tmp);
                 $$ = f_tmp.off;
         }
-        | indexed_variable
+        | indexed_variable RBRACKET
         {
                 create_llvmcode(GetElem);
         }
@@ -377,7 +379,6 @@ indexed_variable
                 create_llvmcode(Sub);
                 create_llvmcode(Sext);
         }
-        RBRACKET
         ;
 
 

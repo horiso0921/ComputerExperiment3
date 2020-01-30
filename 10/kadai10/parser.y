@@ -121,7 +121,10 @@ forward_arg_list
 
 forward_arg
         : forward_arg COMMA IDENT
+        | forward_arg COMMA IDENT LBRACKET NUMBER INTERVAL NUMBER RBRACKET
         | IDENT
+        | IDENT LBRACKET NUMBER INTERVAL NUMBER RBRACKET
+        ;
         ;
 
 subprog_decl_part
