@@ -607,7 +607,8 @@ factor
         ;
 
 func_call
-        : func_call_name LPAREN arg_list RPAREN
+        : func_call_name LPAREN RPAREN
+        | func_call_name LPAREN arg_list RPAREN
         ;
 
 func_call_name 

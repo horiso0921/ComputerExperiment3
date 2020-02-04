@@ -9,7 +9,7 @@ declare i32 @printf(i8*, ...)
 @l = common global i32 0, align 4
 
 define void @x0() {
-  %1 = alloca [10 x i32] zeroinitializer, align 16
+  %1 = alloca [10 x i32], align 16
   %2 = sext i32 0 to i64
   %3 = getelementptr inbounds [10 x i32], [10 x i32]* %1, i64 0, i64 %2
   store i32 10, i32* %3, align 4

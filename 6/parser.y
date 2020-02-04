@@ -244,9 +244,7 @@ statement
                 }
                 (tmp->args).call.proc = arg;
                 (tmp->args).call.rettype = vo;
-                
                 add_llvmnode(tmp);
-
         }
         | null_statement
         | block_statement
